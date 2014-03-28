@@ -100,7 +100,7 @@ public abstract class AbstractActivityTest extends TestCase {
    * @return
    * @throws InterruptedException 
    */
-  protected List<ExoSocialActivity> listOf(int n, String posterId, boolean isComment, boolean isSave) throws InterruptedException {
+  protected List<ExoSocialActivity> listOfPerf(int n, String posterId, boolean isComment, boolean isSave) throws InterruptedException {
     List<ExoSocialActivity> list = new LinkedList<ExoSocialActivity>();
     ExoSocialActivity a = null;
     for (int i = 0; i < n; i++) {
@@ -117,6 +117,30 @@ public abstract class AbstractActivityTest extends TestCase {
         cachedActivityStorage.saveActivity(a);
       }
       
+      
+      list.add(a);
+    }
+    
+    return list;
+  }
+  
+  protected List<ExoSocialActivity> listOf(int n, String posterId, boolean isComment, boolean isSave) throws InterruptedException {
+    List<ExoSocialActivity> list = new LinkedList<ExoSocialActivity>();
+    ExoSocialActivity a = null;
+    for (int i = 0; i < n; i++) {
+      a = ActivityBuilder.getInstance()
+                         .posterId(posterId == null ? getRandomIdentity(n) : posterId)
+                         .title("title" + i)
+                         .body("body" + i)
+                         .titleId("titleId" + i)
+                         .isComment(isComment)
+                         .posterProviderId(IdentityProvider.USER.getName())
+                         .take();
+      
+      if (isSave) {
+        cachedActivityStorage.saveActivity(a);
+      }
+      Thread.sleep(10);
       
       list.add(a);
     }

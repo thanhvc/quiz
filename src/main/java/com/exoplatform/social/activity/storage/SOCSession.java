@@ -33,19 +33,19 @@ public class SOCSession {
 
   public void startSession() {
     if (started) {
-      //System.out.print("session started....");
+      System.out.print("session started....");
     } else {
       started = true;
-      //System.out.print("start new session....");
+      System.out.print("start new session....");
     }
   }
   
   public void stopSession() {
     if (started) {
       started = false;
-      //System.out.println("stop session.");
+      System.out.println("stop session.");
     } else {
-      //System.out.println("start new session.");
+      System.out.println("start new session.");
     }
   }
   

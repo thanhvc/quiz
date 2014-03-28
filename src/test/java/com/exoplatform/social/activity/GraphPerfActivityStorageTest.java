@@ -38,7 +38,7 @@ public class GraphPerfActivityStorageTest extends AbstractActivityTest {
 
   private void prerformance(int length) throws Exception {
     watch.start();
-    List<ExoSocialActivity> list = listOf(length, null, false, true);
+    List<ExoSocialActivity> list = listOfPerf(length, null, false, true);
     assertEquals(length, list.size());
     watch.stop();
     System.out.println("Process:: activities:" + length + "| vertices=" + socContext.getActivityCacheGraph().getVertexSize() + "| edges: " + socContext.getActivityCacheGraph().getEdgeSize() + " | elapsed=" + watch.toString(watch.elapsedTime(), TimeUnit.MILLISECONDS));

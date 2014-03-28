@@ -31,7 +31,6 @@ import com.exoplatform.social.graph.Vertex;
  * Mar 17, 2014  
  */
 public class GraphCachedActivityStorageTest extends AbstractActivityTest {
-  
   public void testAdd() throws Exception {
     ExoSocialActivity activity = ActivityBuilder.getInstance()
                                                 .posterId("mary")
