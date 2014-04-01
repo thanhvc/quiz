@@ -64,15 +64,6 @@ public abstract class GraphContext<V extends Element, E extends Element> {
    * @param handle the removed vertex's handle
    */
   public void removeVertex(Class<?> type, Object handle) {
-//    int i = this.rootVertex.indexOf(type, handle);
-//    if (i >= 0) {
-//      this.rootVertex.remove(i);
-//      List<Edge<V>> list = this.getEdges(handle);
-//      for(Edge<V> e : list) {
-//        this.removeEdge(e.getLabel());
-//      }
-//    }
-    
   if (this.rootVertex.removeVertex(handle)) {
     List<Edge<V>> list = this.getEdges(handle);
     for(Edge<V> e : list) {

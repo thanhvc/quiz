@@ -217,7 +217,7 @@ public class VertexContext<V extends Element, E extends Element> extends LinkedL
       return false;
     }
     
-    VertexContext that = (VertexContext) o;
+    VertexContext<?,?> that = (VertexContext<?, ?>) o;
 
     if (handle != null ? !handle.equals(that.handle) : that.handle != null) {
       return false;

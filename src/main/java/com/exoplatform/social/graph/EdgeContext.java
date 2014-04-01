@@ -16,6 +16,7 @@
  */
 package com.exoplatform.social.graph;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,6 +44,8 @@ class EdgeContext<V extends Element> {
   
   /**
    * Add the edge associated with the vertex's handle.
+   * 1. inVertex, pus in the map what its handle associated with all of edges
+   * 2. outVertex, pus in the map what its handle associated with all of edges
    * 
    * @param handle the edge's label
    * @param edge the edge
@@ -132,15 +135,15 @@ class EdgeContext<V extends Element> {
   public List<V> getAdjacents(Object name) {
     List<Object> edgeHandles = this.vertexEdgeMap.get(name);
     //
-    if (edgeHandles == null) return Collections.emptyList();
-    
-    //
-    List<V> vertices = new ArrayList<V>(edgeHandles.size());  
-    for(Object handle : edgeHandles) {
+    if (edgeHandles == null)
+      return Collections.emptyList();
+
+    List<V> vertices = new ArrayList<V>(edgeHandles.size());
+    for (Object handle : edgeHandles) {
       vertices.add(this.incidences.get(handle).getOutVertex(name));
     }
-    
-    return vertices;
+
+    return Collections.unmodifiableList(vertices);
   }
   /**
    * Gets the edges by the vertex's name
@@ -159,7 +162,7 @@ class EdgeContext<V extends Element> {
       edges.add(this.incidences.get(handle));
     }
     
-    return edges;
+    return Collections.unmodifiableList(edges);
   }
   
   /**
