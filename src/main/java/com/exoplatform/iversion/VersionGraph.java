@@ -17,12 +17,8 @@
 package com.exoplatform.iversion;
 
 import java.util.Map;
-import java.util.Set;
-
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 /**
@@ -62,21 +58,14 @@ public class VersionGraph<K, V, M> extends VersionGraphBase<K, V, M> {
     }
     
     void add(Version<K, V, M> version) {
-      checkRevision(tip, version);
-      tip = new VersionNode<K, V, M>(version, revisionsToNodes(version.parentRevisons));
+      Preconditions.checkNotNull(version, "version");
+      tip = new VersionNode<K, V, M>(tip, version, revisionsToNodes(version.parentRevisons));
       
     }
     
     VersionGraph<K, V, M> build() {
       return new VersionGraph<K, V, M>(parentGraph, versionNodes, tip);
     }
-    
-    private static void checkRevision(VersionNode<?, ?, ?> tip, Version<?, ?, ?> version) {
-      Preconditions.checkNotNull(version, "version");
-      if (tip != null && version.revision <= tip.getRevision()) {
-          throw new IllegalVersionOrderException(tip.getRevision(), version.revision);
-      }
-  }
     
   }
 

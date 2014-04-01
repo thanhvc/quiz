@@ -1,0 +1,12 @@
+1. Makes sure AcitivtiesListData just keep fixed activities list
+- As Capped Collections are circular, fixed-size collections that keep the activity model for each stream.
+- The order of item follows the whats hot rule.
+- The fixed-number will be provided by configuration.
+
+2. Implement CacheListener when the cache item has been expired
+
+3. Refactoring to apply SoftReference for EdgeContext and vertexContext
+
+4. Applies Collections.unmodified for collections, to handle more better with case concurrency changes.
+
+5.
