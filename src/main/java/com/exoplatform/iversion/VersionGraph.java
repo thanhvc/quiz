@@ -16,9 +16,11 @@
  */
 package com.exoplatform.iversion;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.Set;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 /**
@@ -27,45 +29,86 @@ import com.google.common.collect.Maps;
  *          exo@exoplatform.com
  * Mar 30, 2014  
  */
-public class VersionGraph<K, V, M> extends VersionGraphBase<K, V, M> {
+public abstract class VersionGraph<K, V, M,
+                  T extends Version<K, V, M>,
+                  G extends VersionGraph<K, V, M, T, G>> 
+       extends VersionGraphBase<K, V, M,T, G> {
 
   /** */
-  public final VersionNode<K, V, M> tip;
+  public final VersionNode<K, V, M, T> tip;
   
   
-  VersionGraph(VersionGraph<K, V, M> parentGraph, Map<Long, VersionNode<K, V, M>> versionNodes, VersionNode<K, V, M> tip) {
-    super(parentGraph, versionNodes);
-    this.tip = tip;
+  protected VersionGraph(Builder<K, V, M, T, G> builder) {
+    super(builder.parentGraph, Collections.unmodifiableMap(builder.versionNodes));
+    this.tip = builder.tip;
   }
   
-  public static <K, V, M> VersionGraph<K, V, M> init(Version<K, V, M> version) {
-    Builder<K, V, M> builder = new Builder<K, V, M>();
+  public abstract G commit(T version);
+  
+  public abstract G commit(Iterable<T> versions);
+  
+  public final Merge<K, V> merge(Set<Long> revisions) {
+    return new Merge<K, V>(Iterables.transform(revisions, this));
+  }
+
+  protected static <K, 
+                    V, 
+                    M, 
+                    T extends Version<K, V, M>, 
+                    G extends VersionGraph<K, V, M, T, G>> 
+            G build(Builder<K, V, M, T, G> builder) {
+    return builder.build();
+  }
+  
+  protected static <K, V, M, T extends Version<K, V, M>,
+                             G extends VersionGraph<K, V, M, T, G>> 
+                      G build(Builder<K, V, M, T, G> builder, T version) {
     builder.add(version);
     return builder.build();
   }
   
-  public static class Builder<K, V, M> extends VersionGraphBase<K, V, M> {
-
-    private VersionNode<K, V, M> tip;
+  protected static <K, 
+                    V, 
+                    M, 
+                    T extends Version<K, V, M>,
+                    G extends VersionGraph<K, V, M, T, G>> 
+            G build(Builder<K, V, M, T, G> builder, Iterable<T> versions) {
     
-    public Builder() {
+    for(T version : versions) {
+      builder.add(version);
+    }
+    
+    return builder.build();
+  }
+  
+  
+  
+  public static abstract class Builder<K, V, M,
+                 T extends Version<K, V, M>,
+                 G extends VersionGraph<K, V, M, T, G>> 
+         extends VersionGraphBase<K, V, M, T, G> {
+
+    private VersionNode<K, V, M, T> tip;
+    
+    protected Builder() {
       this(null);
     }
     
-    Builder(VersionGraph<K, V, M> parentGraph) {
-      super(parentGraph, Maps.<Long, VersionNode<K, V, M>>newLinkedHashMap());
-      this.tip = parentGraph.tip;
-    }
-    
-    void add(Version<K, V, M> version) {
-      Preconditions.checkNotNull(version, "version");
-      tip = new VersionNode<K, V, M>(tip, version, revisionsToNodes(version.parentRevisons));
+    protected Builder(G parentGraph) {
+      super(parentGraph, Maps.<Long, VersionNode<K, V, M, T>>newLinkedHashMap());
+      if (parentGraph != null) {
+        this.tip = parentGraph.tip;
+      }
       
     }
     
-    VersionGraph<K, V, M> build() {
-      return new VersionGraph<K, V, M>(parentGraph, versionNodes, tip);
+    void add(T version) {
+      Preconditions.checkNotNull(version, "version");
+      tip = new VersionNode<K, V, M, T>(tip, version, revisionsToNodes(version.parentRevisons));
+      versionNodes.put(version.revision, tip);
     }
+    
+    protected abstract G build();
     
   }
 

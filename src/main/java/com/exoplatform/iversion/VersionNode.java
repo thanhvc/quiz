@@ -31,15 +31,15 @@ import com.google.common.collect.Maps;
  *          exo@exoplatform.com
  * Mar 30, 2014  
  */
-public class VersionNode<K, V, M> {
+public class VersionNode<K, V, M, T extends Version<K, V, M>> {
   /** */
-  public final Version<K, V, M> version;
+  public final T version;
   
   /** */
-  public final VersionNode<K, V, M> previous;
+  public final VersionNode<K, V, M, T> previous;
   
   /** */
-  public final Set<VersionNode<K, V, M>> parents;
+  public final Set<VersionNode<K, V, M, T>> parents;
   
   /** */
   private volatile SoftReference<Map<K, VersionProperty<V>>> softProperties;
@@ -47,7 +47,7 @@ public class VersionNode<K, V, M> {
   /** */
   private volatile SoftReference<Set<Long>> softRevisions;
 
-  public VersionNode(VersionNode<K, V, M> previous, Version<K, V, M> version, Set<VersionNode<K, V, M>> parents) {
+  public VersionNode(VersionNode<K, V, M, T> previous, T version, Set<VersionNode<K, V, M, T>> parents) {
     Preconditions.checkNotNull(version, "version");
     Preconditions.checkNotNull(parents, "parents");
     
@@ -101,7 +101,7 @@ public class VersionNode<K, V, M> {
   public Map<K, VersionProperty<V>> mergeProperties() {
     Map<K, VersionProperty<V>> properties = Maps.newLinkedHashMap();
     
-    for(VersionNode<K, V, M> parent : parents) {
+    for(VersionNode<K, V, M, T> parent : parents) {
       for(Map.Entry<K, VersionProperty<V>> entry : parent.getProperties().entrySet()) {
         K key = entry.getKey();
         //TODO: this code processes only get latest property value
@@ -121,7 +121,23 @@ public class VersionNode<K, V, M> {
     return Collections.unmodifiableMap(properties);
   }
   
-  
+  /**
+   * Collections all of this parents's revision and this revision
+   *     v1
+   *     |
+   *     ---k1,v1
+   *     ---k2,v2
+   *     |
+   *     v2
+   *     --k3,v3
+   *     |
+   *     v3 <------- current revision
+   *     --k4,v4
+   * 
+   * the list of revisions is v3, v2, v1
+   *     
+   * @return
+   */
   public Set<Long> getRevisions() {
     Set<Long> revisions = softRevisions.get();
     
@@ -139,12 +155,31 @@ public class VersionNode<K, V, M> {
     revisions.add(getRevision());
     
     //
-    for(VersionNode<K, V, M> parent : parents) {
+    for(VersionNode<K, V, M, T> parent : parents) {
       revisions.addAll(parent.getRevisions());
     }
   }
   
   public long getRevision() {
     return version.revision;
+  }
+  
+  @Override
+  public String toString() {
+    return toString(new StringBuilder()).toString();
+  }
+
+  public StringBuilder toString(StringBuilder sb) {
+    sb.append(this.version.toString());
+    if (softProperties.get() != null) {
+      Map<K, VersionProperty<V>> properties = this.softProperties.get(); 
+      sb.append(",properties=[{");
+      for (Map.Entry<K, VersionProperty<V>> entry : properties.entrySet()) {
+        sb.append(entry.getKey()).append("=").append(entry.getValue().toString()).append(",");
+      }
+      sb.append("}]");
+    }
+    
+    return sb;
   }
 }

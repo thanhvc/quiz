@@ -32,4 +32,9 @@ public class VersionProperty<V> {
     this.revision = revision;
     this.value = value;
   }
+  
+  @Override
+  public String toString() {
+    return revision + ":" + this.value.toString();
+  }
 }

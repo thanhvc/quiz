@@ -73,8 +73,12 @@ public class Version<K, V, M> {
   
   private Function<? super V, VersionProperty<V>> toVersionProperties() {
     return new ToVersionProperties();
-}
+  }
   
+  @Override
+  public String toString() {
+    return "Version[revision = " + revision + "]";
+  }
   
   public static class Builder<K, V, M> {
     /** */
@@ -107,7 +111,7 @@ public class Version<K, V, M> {
       return this;
     }
     
-    public Builder<K, V, M> parentRevisions(Set<Long> parentRevisions) {
+    public Builder<K, V, M> parents(Set<Long> parentRevisions) {
       this.parentRevisions = parentRevisions;
       return this;
     }

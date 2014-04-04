@@ -30,34 +30,37 @@ import com.google.common.collect.Iterables;
  *          exo@exoplatform.com
  * Mar 30, 2014  
  */
-public abstract class VersionGraphBase<K, V, M> {
+public abstract class VersionGraphBase<K, V, M,
+                                        T extends Version<K, V, M>,
+                                        G extends VersionGraph<K, V, M, T, G>> 
+                implements Function<Long, VersionNode<K, V, M, T>>{
   /** */
-  public final VersionGraph<K, V, M> parentGraph;
+  public final VersionGraph<K, V, M, T, G> parentGraph;
   
   /** */
-  public final Map<Long, VersionNode<K, V, M>> versionNodes;
+  public final Map<Long, VersionNode<K, V, M, T>> versionNodes;
   
   private final RevisionToVersionNode revisionToVersionNode = new RevisionToVersionNode();
   
-  private class RevisionToVersionNode implements Function<Long, VersionNode<K, V, M>> {
+  private class RevisionToVersionNode implements Function<Long, VersionNode<K, V, M, T>> {
 
     @Override
-    public VersionNode<K, V, M> apply(Long input) {
+    public VersionNode<K, V, M, T> apply(Long input) {
       return getVersionNode(input);
     }
   }
   
-  VersionGraphBase(VersionGraph<K, V, M> parentGraph, Map<Long, VersionNode<K, V, M>> versionNodes) {
+  VersionGraphBase(VersionGraph<K, V, M, T, G> parentGraph, Map<Long, VersionNode<K, V, M, T>> versionNodes) {
     this.parentGraph = parentGraph;
     this.versionNodes = Preconditions.checkNotNull(versionNodes, "versionNodes");
   }
   
-  Set<VersionNode<K, V, M>> revisionsToNodes(Iterable<Long> revisions) {
+  Set<VersionNode<K, V, M, T>> revisionsToNodes(Iterable<Long> revisions) {
     return ImmutableSet.copyOf(Iterables.transform(revisions, revisionToVersionNode));
   }
   
-  public VersionNode<K, V, M> getVersionNode(long revision) {
-    VersionNode<K, V, M> node = versionNodes.get(revision);
+  public VersionNode<K, V, M, T> getVersionNode(long revision) {
+    VersionNode<K, V, M, T> node = versionNodes.get(revision);
     if (node == null) {
       if(parentGraph != null) {
         return parentGraph.getVersionNode(revision);
@@ -67,6 +70,11 @@ public abstract class VersionGraphBase<K, V, M> {
     }
     
     return node;
+  }
+  
+  @Override
+  public VersionNode<K, V, M, T> apply(Long input) {
+    return input != null ? getVersionNode(input) : null;
   }
 
 }

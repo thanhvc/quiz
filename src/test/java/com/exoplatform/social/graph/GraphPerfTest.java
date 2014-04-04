@@ -87,5 +87,7 @@ public class GraphPerfTest extends AbstractGraphTest {
     prerformance(900000);
     graph.clear();
     prerformance(1000000);
+    
+    Thread.sleep(5000);
   }
 }
