@@ -18,10 +18,16 @@ package com.exoplatform.social.graph;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.LinkedListMultimap;
+
+
 
 /**
  * Created by The eXo Platform SAS
@@ -32,14 +38,19 @@ import java.util.Map;
 class EdgeContext<V extends Element> {
   
   /** the mapping vertex's handle and list of edges's handle */
-  final Map<Object, SoftReference<List<Object>>> vertexEdgeMap;
+  //final Map<Object, SoftReference<List<Object>>> vertexEdgeMap;
+  
+  final ListMultimap<Object, Object> vertexEdgeMultiMap;
   
   /**  the mapping edge's label and edge*/
   final Map<Object, SoftReference<Edge<V>>> incidences;
   
   public EdgeContext() {
-    vertexEdgeMap = new Hashtable<Object, SoftReference<List<Object>>>();
+    //vertexEdgeMap = new Hashtable<Object, SoftReference<List<Object>>>();
+    
     incidences = new Hashtable<Object, SoftReference<Edge<V>>>();
+    
+    vertexEdgeMultiMap = LinkedListMultimap.create();
   }
   
   /**
@@ -65,26 +76,8 @@ class EdgeContext<V extends Element> {
     }
     
     //process IN
-    SoftReference<List<Object>> softInSet = vertexEdgeMap.get(edge.inVertex.getHandle());
-    List<Object> inSet = softInSet != null ? softInSet.get() : new ArrayList<Object>();
-    if (softInSet == null) {
-      this.vertexEdgeMap.put(edge.inVertex.getHandle(), softReference(inSet));  
-    }
-      
-    //
-    inSet.add(edge.handle);
-
-    //process OUT
-    SoftReference<List<Object>> softOutSet = vertexEdgeMap.get(edge.outVertex.getHandle());
-    
-    List<Object> outSet = softOutSet != null ? softOutSet.get() : new ArrayList<Object>();
-    if (softOutSet == null) {
-      this.vertexEdgeMap.put(edge.outVertex.getHandle(), softReference(outSet));
-    }
-    
-    //
-    outSet.add(edge.handle);
-    
+    vertexEdgeMultiMap.put(edge.inVertex.getHandle(), edge.handle);
+    vertexEdgeMultiMap.put(edge.outVertex.getHandle(), edge.handle);
     //
     this.incidences.put(edge.getHandle(), softReference(edge));
   }
@@ -98,17 +91,8 @@ class EdgeContext<V extends Element> {
     Edge<V> v = this.incidences.get(label).get();
     if (v == null) return;
     
-    //IN
-    List<Object> inSet = vertexEdgeMap.get(v.inVertex.getHandle()).get();
-    if (inSet != null) {
-      inSet.remove(v.handle);
-    }
-    
-    //OUT
-    List<Object> outSet = vertexEdgeMap.get(v.outVertex.getHandle()).get();
-    if (outSet != null) {
-      outSet.remove(v.handle);
-    }
+    vertexEdgeMultiMap.remove(v.inVertex.getHandle(), v.handle);
+    vertexEdgeMultiMap.remove(v.outVertex.getHandle(), v.handle);
     
     //removes in incidences
     this.incidences.remove(label);
@@ -120,8 +104,8 @@ class EdgeContext<V extends Element> {
    * @param name the  vertex's handle or edge's label
    */
   public void remove(Object inHandle, Object outHandle) {
-    List<Object> in = vertexEdgeMap.get(inHandle).get();
-    List<Object> out = vertexEdgeMap.get(outHandle).get();
+    Collection<Object> in = vertexEdgeMultiMap.get(inHandle);
+    Collection<Object> out = vertexEdgeMultiMap.get(outHandle);
     
     //
     List<Object> newIn = new ArrayList<Object>(in);
@@ -145,7 +129,7 @@ class EdgeContext<V extends Element> {
    * @return
    */
   public List<V> getAdjacents(Object name) {
-    List<Object> edgeHandles = this.vertexEdgeMap.get(name).get();
+    Collection<Object> edgeHandles = this.vertexEdgeMultiMap.get(name);
     //
     if (edgeHandles == null)
       return Collections.emptyList();
@@ -164,7 +148,7 @@ class EdgeContext<V extends Element> {
    * @return
    */
   public List<Edge<V>> getEdges(Object name) {
-    List<Object> edgeHandles = this.vertexEdgeMap.get(name).get();
+    Collection<Object> edgeHandles = this.vertexEdgeMultiMap.get(name);
     //
     if (edgeHandles == null) return Collections.emptyList();
     
@@ -199,6 +183,6 @@ class EdgeContext<V extends Element> {
    */
   public void clear() {
     this.incidences.clear();
-    this.vertexEdgeMap.clear();
+    this.vertexEdgeMultiMap.clear();
   }
 }
