@@ -1,0 +1,180 @@
+- Merge
+- Version<K, V, M>
+
+- VersionNode<K, V, M, T extends Version<K, V, M>
+
+- VersionGraph<K, V, M, T extends Version<K, V, M>, G extends VersionGraph<K, V, M, T, G>
+- VersionGraphBase<K, V, M, T extends Version<K, V, M>, G extends VersionGraph<K, V, M, T, G>
+- VersionProperty<V>
+
+Version data Structures is a linked data structure with multi versions each derives as a copy of existing version, and maintain a version history of write operation for any version. A particular version of a node is referred to as a revision of the node.
+
+Whenever a version is created from another, it creates a child of the other in a version graph.
+
+More precisely, 
+
+we define version data structure as a tuple (K, V, F, T, G)
+
+where G is set of nodes, F is set of fields, K is set of keys, V is set of value
+T is set of versions t t0 = 0 ...max of integer, G is created 
+
+Here is class diagram    ----------------
+                         |               |
+              ----------------------     | parentGraph
+      -----<> |  VersionGraphBase  |<>---- 
+     |        |                    |
+     |        ----------------------
+     |                   ^
+     |                   |
+     |        ----------------------        --------------------------
+     |  (A)   |  VersionGraph      | <>-----|     (abstract)         |
+     |        ----------------------        |  VersionGraph.Builder  |
+     |                   ^                  --------------------------
+     |                   |
+     |        ----------------------        --------------------------
+     |        |  SimpleVersionGraph |<>-----|     (abstract)         |
+     |        ----------------------        |  VersionGraph.Builder  |           
+     |                                      --------------------------
+     |        ----------------------     
+     |        |   Version<K, V, M> |
+     |        ______________________
+     |
+     |                     ------------------------
+     |                     |                       |
+     |        ------------------------------       | parents (B) 
+     |--------|  VersionNode<K, V, M, T >  | <>-----
+       -----<>|  T extends Version<K, V, M>| <-----                  
+      |        ------------------------------     |
+      |                   |                       |  previous (C)
+      | (C)                ------------------------      
+      |        -----------------------            |
+      |       |   VersionProperty<V> |            |
+       -------|                      |            |
+               ______________________|            |
+                                                  |
+                                                  |
+               Set<Long> softRevisions-------------
+           
+
+
+(A) Map<Long, VersionNode> contains the list of versonNode what contains by VersionGraph
+
+(B) keeps the relationship between VersionNode, parents <-> children
+ each versionNode can have more than one parent VersionNode
+
+ (C) Each VersionNode contains list of properties
+     Each VersionNode contains list of revisions what are its parents
+
+
+A. Add new version.
+
+ ---->SimpleVersionGraph.init();-(I)->versionGraph#commit(version);--(II)
+ ---->new SimpleVersion.Builder(this) --(III)->VersionGraph#build(builder, version)--(IV)->builder.add(version)--(V)-->builder.build()
+
+
+(I) Init SimplaeVersionGraph class
+
+public static SimpleVersionGraph init(SimpleVersion version) {
+    return build(new Builder(), version);
+  }
+
+(II) Commit SimplaeVersionGraph class
+
+public SimpleVersionGraph commit(SimpleVersion version) {
+    return build(new Builder(this), version);
+  }
+
+(III) new instance of SimplaeVersionGraph#Builder class and provide parent
+
+(IV) in VersionGraph class
+     protected static <K, V, M, T extends Version<K, V, M>,
+                             G extends VersionGraph<K, V, M, T, G>> 
+                      G build(Builder<K, V, M, T, G> builder, T version) {
+    builder.add(version);
+    return builder.build();
+  }
+
+b. new constructor of SimpleVersionGraph.Builder provided the parent graph
+at here this is play as parentGraph of new version.
+
+public SimpleVersionGraph commit(SimpleVersion version) {
+    //this as parent graph
+    return build(new Builder(this), version);
+  }
+
+
+B. Merge Merge#merge() is using merging versions to return
+
+<V, F, R, T, G>
+
+V: is a set of VersionNode: 
+  v belongs V
+R: is a set of revision of specified v element and as handle
+
+T: is set of Versions
+t: is a version of v
+
+F: is a set of Properties
+f: is property of v in revision t
+
+G: is a graph version
+
+versionGraph.merge(mergeRevisions); ---> new Merge<K, V>(versionNodes)
+
+Case 1: versionNodes is empty
+
+   mergedProperties = empty
+   revisions = empty
+   conflicts = empty
+
+Case 2: versionNode ha only one element
+   mergedProperties = versionNode.getProperties()
+   revisions = versionNode.getRevisions()
+   conflicts = empty
+
+Case 3: more than one VersionNode
+step i = 1
+- T = T ∪ {t}
+- F = F ∪ {f}
+
+loop V from (i + 1...n)
+  - let (t', f') ∈ V {i+1} where t' !∈ T and f' !∈ F
+     + T = T ∪ {t'}
+     + F = F ∪ {f'}
+
+T: merged revisions
+F: merged properties
+t: revisions of the version included its parent's revision
+f: properties of the version included its parent's properties
+
+
+A new VersionNode operation takes a new handle(revision) and create a node in the version specified by handle(revision)
+
+
+   mergedProperties = versionNode.getProperties()
+   revisions = versionNode.getRevisions()
+   conflicts = empty
+
+using multimap of guava
+
+
+Process:: vertices=2000| edges: 1000| elapsed=27 ms
+Process:: vertices=10000| edges: 5000| elapsed=78 ms
+Process:: vertices=20000| edges: 10000| elapsed=92 ms
+Process:: vertices=40000| edges: 20000| elapsed=96 ms
+Process:: vertices=60000| edges: 30000| elapsed=141 ms
+Process:: vertices=80000| edges: 40000| elapsed=169 ms
+Process:: vertices=100000| edges: 50000| elapsed=238 ms
+Process:: vertices=200000| edges: 100000| elapsed=505 ms
+Process:: vertices=400000| edges: 200000| elapsed=1077 ms
+Process:: vertices=600000| edges: 300000| elapsed=1768 ms
+Process:: vertices=800000| edges: 400000| elapsed=2240 ms
+Process:: vertices=1000000| edges: 500000| elapsed=2778 ms
+Process:: vertices=1200000| edges: 600000| elapsed=3293 ms
+Process:: vertices=1400000| edges: 700000| elapsed=3802 ms
+Process:: vertices=1600000| edges: 800000| elapsed=4555 ms
+Process:: vertices=1800000| edges: 900000| elapsed=11053 ms
+Process:: vertices=2000000| edges: 1000000| elapsed=5541 ms
+
+
+
