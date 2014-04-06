@@ -58,7 +58,14 @@ public abstract class VersionGraphBase<K, V, M,
   Set<VersionNode<K, V, M, T>> revisionsToNodes(Iterable<Long> revisions) {
     return ImmutableSet.copyOf(Iterables.transform(revisions, revisionToVersionNode));
   }
-  
+  /**
+   * Gets versionNode be the given revision.
+   * 1. Finds in the this
+   * 2. If NULL, finds in this parents
+   * 
+   * @param revision
+   * @return
+   */
   public VersionNode<K, V, M, T> getVersionNode(long revision) {
     VersionNode<K, V, M, T> node = versionNodes.get(revision);
     if (node == null) {

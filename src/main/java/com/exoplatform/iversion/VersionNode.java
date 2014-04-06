@@ -143,6 +143,8 @@ public class VersionNode<K, V, M, T extends Version<K, V, M>> {
     
     if (revisions == null) {
       ImmutableSet.Builder<Long> builder = ImmutableSet.builder();
+      
+      //collection it's revision and it parents's revision
       collectRevisions(builder);
       revisions = builder.build();
       softRevisions = softReference(revisions);
@@ -151,6 +153,11 @@ public class VersionNode<K, V, M, T extends Version<K, V, M>> {
     return revisions;
   }
   
+  /**
+   * Collects this revision and all of its parent's revision
+   * 
+   * @param revisions collector revision
+   */
   private void collectRevisions(ImmutableSet.Builder<Long> revisions) {
     revisions.add(getRevision());
     
@@ -160,6 +167,10 @@ public class VersionNode<K, V, M, T extends Version<K, V, M>> {
     }
   }
   
+  /**
+   * Returns this revision
+   * @return
+   */
   public long getRevision() {
     return version.revision;
   }
