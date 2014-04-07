@@ -34,13 +34,13 @@ public class ActivityGraphTest extends AbstractGraphTest {
     ListActivitiesKey johnK = new ListActivitiesKey("john", StreamType.FEED);
     
     //using ListActivitiesKey as key
-    Vertex maryV = graph.addVertex(maryK);
-    Vertex johnV = graph.addVertex(johnK);
+    Vertex<Object> maryV = graph.addVertex(maryK);
+    Vertex<Object> johnV = graph.addVertex(johnK);
     
     graph.addEdge("mary-john", maryV, johnV);
     
     //using String object
-    Vertex demoV = graph.addVertex("demo");
+    Vertex<Object> demoV = graph.addVertex("demo");
     graph.addEdge("mary-demo", maryV, demoV);
     
     assertNotNull(graph.getVertex(maryV.handle));

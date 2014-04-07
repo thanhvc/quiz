@@ -29,7 +29,7 @@ import com.exoplatform.social.activity.model.ExoSocialActivity;
  */
 public class GraphPerfActivityStorageTest extends AbstractActivityTest {
   /** */
-  final static int PERSISTER_THRESHOLD = 100;
+  final static int PERSISTER_THRESHOLD = 1000;
   
   @Override
   public int getPersistThreshold() {

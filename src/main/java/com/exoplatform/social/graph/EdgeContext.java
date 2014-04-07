@@ -145,10 +145,12 @@ class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
    * @return
    */
   public List<V> getAdjacents(Object name) {
-    List<Object> edgeHandles = this.vertexEdgeMap.get(name).get();
+    SoftReference<List<Object>> softEdgeHandles = this.vertexEdgeMap.get(name);
     //
-    if (edgeHandles == null)
+    if (softEdgeHandles == null || softEdgeHandles.get() == null)
       return Collections.emptyList();
+    
+    List<Object> edgeHandles = softEdgeHandles.get();
 
     List<V> vertices = new ArrayList<V>(edgeHandles.size());
     for (Object handle : edgeHandles) {
@@ -164,10 +166,12 @@ class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
    * @return
    */
   public List<Edge<H, V>> getEdges(Object name) {
-    List<Object> edgeHandles = this.vertexEdgeMap.get(name).get();
-    //
-    if (edgeHandles == null) return Collections.emptyList();
     
+    SoftReference<List<Object>> softEdgeHandles = this.vertexEdgeMap.get(name);
+    //
+    if (softEdgeHandles == null || softEdgeHandles.get() == null) return Collections.emptyList();
+    
+    List<Object> edgeHandles = softEdgeHandles.get();
     //
     List<Edge<H, V>> edges = new ArrayList<Edge<H, V>>(edgeHandles.size());
     for(Object handle : edgeHandles) {
