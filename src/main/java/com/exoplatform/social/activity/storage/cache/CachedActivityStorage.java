@@ -40,8 +40,8 @@ import com.exoplatform.social.activity.storage.cache.data.IdentityProvider;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
 import com.exoplatform.social.activity.storage.impl.ActivityStorageImpl.PersisterListener;
-import com.exoplatform.social.graph.UndirectedGraph;
 import com.exoplatform.social.graph.Vertex;
+import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
 /**
  * Created by The eXo Platform SAS
@@ -398,10 +398,10 @@ public class CachedActivityStorage implements ActivityStorage {
     final SOCContext socContext;
     
     /** */
-    final UndirectedGraph activityGraph;
+    final SimpleUndirectGraph activityGraph;
     
     /** */
-    final UndirectedGraph relationshipGraph;
+    final SimpleUndirectGraph relationshipGraph;
     
     public GraphListener(SOCContext socContext) {
      this.activityCache = socContext.getActivityCache();
@@ -421,10 +421,10 @@ public class CachedActivityStorage implements ActivityStorage {
       
       boolean isSpaceActivity = target.getPosterProviderId().equalsIgnoreCase(IdentityProvider.SPACE.getName());
       success |= updateStream(target.getPosterId(), true, isSpaceActivity, target);
-      List<Vertex> vertices = this.relationshipGraph.getAdjacents(target.getPosterId());
+      List<Vertex<Object>> vertices = this.relationshipGraph.getAdjacents(target.getPosterId());
       
       //add new activity for poster's stream, FEED, CONNECTION, MY SPACES, AND MY ACTIVITY
-      for(Vertex v : vertices) {
+      for(Vertex<Object> v : vertices) {
         success |= updateStream(v.unwrap(String.class), false, isSpaceActivity, target);
       }
       
@@ -471,8 +471,8 @@ public class CachedActivityStorage implements ActivityStorage {
 
         // TODO check edge is existing or not
         // add edge and inVertex and outVertex
-        Vertex inVertex = this.activityGraph.getVertex(target.getId());
-        Vertex outVertex = this.activityGraph.addVertex(key);
+        Vertex<Object> inVertex = this.activityGraph.getVertex(target.getId());
+        Vertex<Object> outVertex = this.activityGraph.addVertex(key);
         this.activityGraph.addEdge(key.label(), inVertex, outVertex);
 
       }
@@ -519,10 +519,10 @@ public class CachedActivityStorage implements ActivityStorage {
       
       boolean isSpaceActivity = target.getPosterProviderId().equalsIgnoreCase(IdentityProvider.SPACE.getName());
       success |= removeStream(target.getPosterId(), true, isSpaceActivity, target);
-      List<Vertex> vertices = this.relationshipGraph.getAdjacents(target.getPosterId());
+      List<Vertex<Object>> vertices = this.relationshipGraph.getAdjacents(target.getPosterId());
       
       //add new activity for poster's stream, FEED, CONNECTION, MY SPACES, AND MY ACTIVITY
-      for(Vertex v : vertices) {
+      for(Vertex<Object> v : vertices) {
         success |= removeStream(v.unwrap(String.class), false, isSpaceActivity, target);
       }
       

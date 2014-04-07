@@ -40,9 +40,9 @@ public class EdgeContextTest extends AbstractGraphTest {
   }
   
   public void testRemoveEdge() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     edgeContext.add(e);
     
     assertEquals(1, edgeContext.getAdjacents("mary").size());
@@ -55,9 +55,9 @@ public class EdgeContextTest extends AbstractGraphTest {
   }
   
   public void testAddVertex() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     edgeContext.add(e);
     
     assertEquals(1, edgeContext.getAdjacents("mary").size());
@@ -65,14 +65,14 @@ public class EdgeContextTest extends AbstractGraphTest {
   }
   
   public void testAddExisting() {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     
     edgeContext.add(e);
     
     try {
-      Edge<Vertex> e1 = new Edge<Vertex>("mary-john", maryV, johnV);
+      Edge<Object, Vertex<Object>> e1 = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
       edgeContext.add(e1);
       fail("The edge " + e1.getLabel() + " is already existing.");
     } catch (IllegalArgumentException ex) {
@@ -85,15 +85,15 @@ public class EdgeContextTest extends AbstractGraphTest {
   }
   
   public void testAddMore() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
+    Vertex<Object> maryV = graph.addVertex("mary");
     int numberOfConnections = 10;
-    Vertex v_ith = null;
-    Edge<Vertex> e_ith = null;
+    Vertex<Object> v_ith = null;
+    Edge<Object, Vertex<Object>> e_ith = null;
     
     //
     for(int i = 0; i< numberOfConnections; i++) {
       v_ith = graph.addVertex("user" + i);
-      e_ith = new Edge<Vertex>("mary-user" + i, maryV, v_ith);
+      e_ith = new Edge<Object, Vertex<Object>>("mary-user" + i, maryV, v_ith);
       edgeContext.add(e_ith);
     }
     
@@ -105,17 +105,17 @@ public class EdgeContextTest extends AbstractGraphTest {
   }
   
   public void testGetAdjacents() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e1 = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e1 = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     edgeContext.add(e1);
     
-    Vertex demoV = graph.addVertex("demo");
-    Edge<Vertex> e2 = new Edge<Vertex>("mary-demo", maryV, demoV);
+    Vertex<Object> demoV = graph.addVertex("demo");
+    Edge<Object, Vertex<Object>> e2 = new Edge<Object,Vertex<Object>>("mary-demo", maryV, demoV);
     edgeContext.add(e2);
     
     assertEquals(2, edgeContext.getAdjacents("mary").size());
-    List<Vertex> vertices = edgeContext.getAdjacents("mary");
+    List<Vertex<Object>> vertices = edgeContext.getAdjacents("mary");
     assertEquals("john", vertices.get(0).handle);
     assertEquals("demo", vertices.get(1).handle);
     
@@ -126,17 +126,17 @@ public class EdgeContextTest extends AbstractGraphTest {
   }
   
   public void testGetEdges() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e1 = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e1 = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     edgeContext.add(e1);
     
-    Vertex demoV = graph.addVertex("demo");
-    Edge<Vertex> e2 = new Edge<Vertex>("mary-demo", maryV, demoV);
+    Vertex<Object> demoV = graph.addVertex("demo");
+    Edge<Object, Vertex<Object>> e2 = new Edge<Object, Vertex<Object>>("mary-demo", maryV, demoV);
     edgeContext.add(e2);
     
     assertEquals(2, edgeContext.getAdjacents("mary").size());
-    List<Edge<Vertex>> edges = edgeContext.getEdges("mary");
+    List<Edge<Object, Vertex<Object>>> edges = edgeContext.getEdges("mary");
     assertEquals("mary-john", edges.get(0).label);
     assertEquals("mary-demo", edges.get(1).label);
     

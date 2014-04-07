@@ -22,7 +22,7 @@ package com.exoplatform.social.graph;
  *          exo@exoplatform.com
  * Mar 23, 2014  
  */
-public class Edge<V extends Element> implements Element {
+public class Edge<H, V extends Vertex<H>> implements Element {
   
   /** */
   final Object handle;
@@ -94,14 +94,6 @@ public class Edge<V extends Element> implements Element {
     return name.equals(this.inVertex.getHandle()) ? this.outVertex : this.inVertex;
   }
   
-  /**
-   * Returns the empty edge
-   * @param handle
-   * @return
-   */
-  public static Edge<Element> EMPTY(String handle) {
-    return new Edge<Element>(handle, null, null);
-  }
   
   @Override
   public boolean equals(Object o) {
@@ -113,7 +105,7 @@ public class Edge<V extends Element> implements Element {
       return false;
     }
 
-    Edge<?> that = (Edge<?>) o;
+    Edge<?, ?> that = (Edge<?, ?>) o;
 
     if (label != null ? !label.equals(that.label) : that.label != null) {
       return false;

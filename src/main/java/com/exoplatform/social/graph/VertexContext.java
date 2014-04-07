@@ -26,7 +26,7 @@ import java.util.LinkedList;
  * Mar 22, 2014  
  */
 @SuppressWarnings("serial")
-public class VertexContext<V extends Element, E extends Element> extends LinkedList<VertexContext<V, E>> {
+public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends LinkedList<VertexContext<H, V, E>> {
   /** */
   final Object handle;
   
@@ -36,16 +36,16 @@ public class VertexContext<V extends Element, E extends Element> extends LinkedL
   final Class<?> keyType;
   
   /** */
-  final GraphContext<V,E> graph;
+  final GraphContext<H, V, E> graph;
   
-  public VertexContext(GraphContext<V,E> graph, V vertex) {
+  public VertexContext(GraphContext<H, V, E> graph, V vertex) {
     this.handle = vertex.getHandle();
     this.keyType = this.handle.getClass();
     this.graph = graph;
     this.vertex = vertex;
   }
   
-  public VertexContext(GraphContext<V,E> graph, Object handle) {
+  public VertexContext(GraphContext<H, V, E> graph, Object handle) {
     this.keyType = handle.getClass();
     this.handle = handle;
     this.graph = graph;
@@ -56,18 +56,18 @@ public class VertexContext<V extends Element, E extends Element> extends LinkedL
     return this.handle;
   }
   
-  public <T> VertexContext<V, E> get(Object handle) throws NullPointerException {
+  public <T> VertexContext<H, V, E> get(Object handle) throws NullPointerException {
     if (handle == null) {
       throw new NullPointerException();
     }
-    Iterator<VertexContext<V, E>> it = iterator();
+    Iterator<VertexContext<H, V, E>> it = iterator();
     
     Class<?> inputType = handle.getClass();
     //cast the value by type
     //T v = type.cast(handle);
 
     while(it.hasNext()) {
-      VertexContext<V, E> context = it.next();
+      VertexContext<H, V, E> context = it.next();
       if (inputType.equals(context.keyType)) {
         if (context.handle.equals(handle)) {
           return context;
@@ -82,13 +82,13 @@ public class VertexContext<V extends Element, E extends Element> extends LinkedL
     if (handle == null) {
       throw new NullPointerException();
     }
-    Iterator<VertexContext<V, E>> it = iterator();
+    Iterator<VertexContext<H, V, E>> it = iterator();
     
     //cast the value by type
     T v = type.cast(handle);
     int i = 0;
     while(it.hasNext()) {
-      VertexContext<V, E> context = it.next();
+      VertexContext<H, V, E> context = it.next();
       if (type.equals(context.keyType)) {
         T v1 = type.cast(context.handle);
         if (v1.equals(v)) {
@@ -109,13 +109,13 @@ public class VertexContext<V extends Element, E extends Element> extends LinkedL
    * @param data
    * @return
    */
-  public VertexContext<V, E> insertLast(V vertex) {
+  public VertexContext<H, V, E> insertLast(V vertex) {
     if (vertex == null) {
       throw new NullPointerException("Vertex must not be null.");
     }
     
     //
-    VertexContext<V, E> context = new VertexContext<V, E>(graph, vertex);
+    VertexContext<H, V, E> context = new VertexContext<H, V, E>(graph, vertex);
     addLast(context);
     return context;
   }
@@ -137,7 +137,7 @@ public class VertexContext<V extends Element, E extends Element> extends LinkedL
       throw new IndexOutOfBoundsException("Index " + index + " cannot be negative");
     }
 
-    VertexContext<V, E> context = getFirst();
+    VertexContext<H, V, E> context = getFirst();
     while (context != null && index-- > 0) {
       context = context.element();
     }
@@ -158,7 +158,7 @@ public class VertexContext<V extends Element, E extends Element> extends LinkedL
    * @throws IllegalStateException
    */
   public <T> boolean removeVertex(Object name) throws NullPointerException, IllegalArgumentException, IllegalStateException {
-    VertexContext<V, E> vertex = get(name);
+    VertexContext<H, V, E> vertex = get(name);
     if(vertex == null) {
       throw new IllegalArgumentException("Can remove non existent " + name + " child.");
     }
@@ -192,12 +192,12 @@ public class VertexContext<V extends Element, E extends Element> extends LinkedL
    * @throws IndexOutOfBoundsException
    * @throws IllegalStateException
    */
-  public <T> VertexContext<V, E> add(Integer index, Object handle) throws NullPointerException, IndexOutOfBoundsException, IllegalStateException {
+  public <T> VertexContext<H, V, E> add(Integer index, Object handle) throws NullPointerException, IndexOutOfBoundsException, IllegalStateException {
     if (handle == null) {
       throw new NullPointerException("No null name accepted");
     }
     
-    VertexContext<V, E> context = new VertexContext<V, E>(graph, handle);
+    VertexContext<H, V, E> context = new VertexContext<H, V, E>(graph, handle);
     
     //
     if (index == null) {
@@ -217,7 +217,7 @@ public class VertexContext<V extends Element, E extends Element> extends LinkedL
       return false;
     }
     
-    VertexContext<?,?> that = (VertexContext<?, ?>) o;
+    VertexContext<?,?,?> that = (VertexContext<?, ?, ?>) o;
 
     if (handle != null ? !handle.equals(that.handle) : that.handle != null) {
       return false;

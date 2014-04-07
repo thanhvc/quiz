@@ -24,6 +24,7 @@ import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
 import com.exoplatform.social.graph.UndirectedGraph;
 import com.exoplatform.social.graph.Vertex;
+import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
 /**
  * Created by The eXo Platform SAS
@@ -38,14 +39,14 @@ public class SOCContext {
   final Map<ListActivitiesKey, ActivitiesListData> activitiesCache;
   
   /** */
-  final UndirectedGraph activityCacheGraph;
+  final SimpleUndirectGraph activityCacheGraph;
   
   /** */
-  final UndirectedGraph relationshipCacheGraph;
+  final SimpleUndirectGraph relationshipCacheGraph;
   
   public SOCContext() {
-    this.activityCacheGraph = new UndirectedGraph(Vertex.MODEL);
-    this.relationshipCacheGraph = new UndirectedGraph(Vertex.MODEL);
+    this.activityCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
+    this.relationshipCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
     this.activityCache = new HashMap<String, ActivityData>();
     this.activitiesCache = new HashMap<ListActivitiesKey, ActivitiesListData>();
   }
@@ -59,7 +60,7 @@ public class SOCContext {
    * 
    * @return the activity graph
    */
-  public UndirectedGraph getActivityCacheGraph() {
+  public SimpleUndirectGraph getActivityCacheGraph() {
     return activityCacheGraph;
   }
   
@@ -68,7 +69,7 @@ public class SOCContext {
    * 
    * @return the graph connection
    */
-  public UndirectedGraph getRelationshipCacheGraph() {
+  public SimpleUndirectGraph getRelationshipCacheGraph() {
     return relationshipCacheGraph;
   }
 

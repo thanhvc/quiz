@@ -22,18 +22,24 @@ package com.exoplatform.social.graph;
  *          exo@exoplatform.com
  * Mar 22, 2014  
  */
-public class Vertex implements Element {
+public class Vertex<H> implements Element {
   
-  public static final VertexModel<Vertex, Edge<Vertex>> MODEL = new VertexModel<Vertex, Edge<Vertex>>() {
-    public VertexContext<Vertex, Edge<Vertex>> getContext(Vertex vertex) {
-        return vertex.context;
+   @SuppressWarnings("rawtypes")
+  public static VertexModel MODEL = new VertexModel() {
+
+    @Override
+    public VertexContext getContext(Vertex vertex) {
+      return vertex.context;
     }
 
-    public Vertex create(VertexContext<Vertex, Edge<Vertex>> context) {
-        return new Vertex(context);
+    @SuppressWarnings("unchecked")
+    @Override
+    public Vertex create(VertexContext context) {
+      return new Vertex(context);
     }
-  };
-
+     
+   };
+  
   /** */
   final Object handle;
   
@@ -44,9 +50,9 @@ public class Vertex implements Element {
   final ElementType type;
   
   /** */
-  final VertexContext<Vertex, Edge<Vertex>> context;
+  final VertexContext<H, Vertex<H>, Edge<H, Vertex<H>>> context;
   
-  public Vertex(VertexContext<Vertex, Edge<Vertex>> context) {
+  public Vertex(VertexContext<H, Vertex<H>, Edge<H, Vertex<H>>> context) {
     this.handle = context.getHandle();
     this.keyType = this.handle.getClass();
     this.type = ElementType.VERTEX;
@@ -81,7 +87,7 @@ public class Vertex implements Element {
       return false;
     }
 
-    Vertex that = (Vertex) o;
+    Vertex<?> that = (Vertex<?>) o;
 
     if (handle != null ? !handle.equals(that.handle) : that.handle != null) {
       return false;

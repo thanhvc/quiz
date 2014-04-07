@@ -29,17 +29,17 @@ import java.util.Map;
  *          exo@exoplatform.com
  * Mar 22, 2014  
  */
-class EdgeContext<V extends Element> {
-  
+class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
+  //TODO improve this E extends Edge<H,V>
   /** the mapping vertex's handle and list of edges's handle */
   final Map<Object, SoftReference<List<Object>>> vertexEdgeMap;
   
   /**  the mapping edge's label and edge*/
-  final Map<Object, SoftReference<Edge<V>>> incidences;
+  final Map<Object, SoftReference<Edge<H, V>>> incidences;
   
   public EdgeContext() {
     vertexEdgeMap = new Hashtable<Object, SoftReference<List<Object>>>();
-    incidences = new Hashtable<Object, SoftReference<Edge<V>>>();
+    incidences = new Hashtable<Object, SoftReference<Edge<H, V>>>();
   }
   
   /**
@@ -59,7 +59,7 @@ class EdgeContext<V extends Element> {
    * @param handle the edge's label
    * @param edge the edge
    */
-  public void add(Edge<V> edge) {
+  public void add(Edge<H, V> edge) {
     if (this.incidences.containsKey(edge.getHandle())) {
       throw new IllegalArgumentException("The edge " + edge.getLabel() + " is already existing.");
     }
@@ -95,7 +95,7 @@ class EdgeContext<V extends Element> {
    * @param name the  vertex's handle or edge's label
    */
   public void remove(String label) {
-    Edge<V> v = this.incidences.get(label).get();
+    Edge<H, V> v = this.incidences.get(label).get();
     if (v == null) return;
     
     //IN
@@ -163,13 +163,13 @@ class EdgeContext<V extends Element> {
    * @param name the vertex's name
    * @return
    */
-  public List<Edge<V>> getEdges(Object name) {
+  public List<Edge<H, V>> getEdges(Object name) {
     List<Object> edgeHandles = this.vertexEdgeMap.get(name).get();
     //
     if (edgeHandles == null) return Collections.emptyList();
     
     //
-    List<Edge<V>> edges = new ArrayList<Edge<V>>(edgeHandles.size());
+    List<Edge<H, V>> edges = new ArrayList<Edge<H, V>>(edgeHandles.size());
     for(Object handle : edgeHandles) {
       edges.add(this.incidences.get(handle).get());
     }
@@ -190,7 +190,7 @@ class EdgeContext<V extends Element> {
    * @param label
    * @return
    */
-  public Edge<V> get(Object label) {
+  public Edge<H, V> get(Object label) {
     return this.incidences.get(label).get();
   }
   

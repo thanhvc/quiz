@@ -33,15 +33,15 @@ public class GraphPerfTest extends AbstractGraphTest {
   private void prerformance(int length) throws Exception {
     watch.start();
     Random r = new Random();
-    Vertex v_ith = null;
-    Edge<Vertex> e_ith = null;
+    Vertex<Object> v_ith = null;
+    Edge<Object, Vertex<Object>> e_ith = null;
     
     //
     for(int i = 0; i< length; i++) {
       String user = "inUser" + r.nextInt(length);
-      Vertex userV = graph.addVertex(user);
+      Vertex<Object> userV = graph.addVertex(user);
       v_ith = graph.addVertex("user" + i);
-      e_ith = new Edge<Vertex>(user + "_user" + i, userV, v_ith);
+      e_ith = new Edge<Object, Vertex<Object>>(user + "_user" + i, userV, v_ith);
       graph.addEdge(e_ith);
     }
     

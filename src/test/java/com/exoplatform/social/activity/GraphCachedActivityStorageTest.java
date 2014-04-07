@@ -44,9 +44,9 @@ public class GraphCachedActivityStorageTest extends AbstractActivityTest {
     
     cachedActivityStorage.saveActivity(activity);
     
-    Vertex v = socContext.getActivityCacheGraph().getVertex(activity.getId());
+    Vertex<Object> v = socContext.getActivityCacheGraph().getVertex(activity.getId());
     assertNotNull(v);
-    List<Vertex> adjacents = socContext.getActivityCacheGraph().getAdjacents(activity.getId());
+    List<Vertex<Object>> adjacents = socContext.getActivityCacheGraph().getAdjacents(activity.getId());
     assertNotNull(adjacents);
     assertEquals(2, adjacents.size());
     
@@ -66,9 +66,9 @@ public class GraphCachedActivityStorageTest extends AbstractActivityTest {
     
     ExoSocialActivity activity = list.get(0);
     
-    Vertex v = socContext.getActivityCacheGraph().getVertex(activity.getId());
+    Vertex<Object> v = socContext.getActivityCacheGraph().getVertex(activity.getId());
     assertNotNull(v);
-    List<Vertex> adjacents = socContext.getActivityCacheGraph().getAdjacents(activity.getId());
+    List<Vertex<Object>> adjacents = socContext.getActivityCacheGraph().getAdjacents(activity.getId());
     assertNotNull(adjacents);
     assertEquals(2, adjacents.size());
     

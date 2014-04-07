@@ -21,24 +21,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public abstract class GraphContext<V extends Element, E extends Element> {
+public abstract class GraphContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
   /** */
-  final EdgeContext<V> edgeContext;
+  final EdgeContext<H, V, E> edgeContext;
   
   /** */
-  final VertexContext<V, E> rootVertex;
+  final VertexContext<H, V, E> rootVertex;
   
   /** */
-  final VertexModel<V, E> vertexModel;
+  final VertexModel<H, V, E> vertexModel;
 
-  public GraphContext(VertexModel<V, E> vertexModel) {
+  public GraphContext(VertexModel<H, V, E> vertexModel) {
     this.vertexModel = vertexModel;
-    this.edgeContext = new EdgeContext<V>();
-    this.rootVertex = new VertexContext<V, E>(this, "root");
+    this.edgeContext = new EdgeContext<H, V, E>();
+    this.rootVertex = new VertexContext<H, V, E>(this, "root");
     
   }
   
-  public abstract Edge<V> addEdge(String label, V inVertex, V outVertex);
+  public abstract Edge<H, V> addEdge(String label, V inVertex, V outVertex);
   
   /**
    * Adds new the vertex into the graph at the last positions
@@ -46,7 +46,7 @@ public abstract class GraphContext<V extends Element, E extends Element> {
    * @param vertex the vertex
    * @return the context
    */
-  public VertexContext<V, E> addVertex(V vertex) {
+  public VertexContext<H, V, E> addVertex(V vertex) {
     return this.rootVertex.insertLast(vertex);
   }
   
@@ -65,8 +65,8 @@ public abstract class GraphContext<V extends Element, E extends Element> {
    */
   public void removeVertex(Class<?> type, Object handle) {
   if (this.rootVertex.removeVertex(handle)) {
-    List<Edge<V>> list = this.getEdges(handle);
-    for(Edge<V> e : list) {
+    List<Edge<H, V>> list = this.getEdges(handle);
+    for(Edge<H, V> e : list) {
       this.removeEdge(e.getLabel());
     }
   }
@@ -76,7 +76,7 @@ public abstract class GraphContext<V extends Element, E extends Element> {
    * 
    * @param e
    */
-  public void addEdge(Edge<V> e) {
+  public void addEdge(Edge<H, V> e) {
     this.edgeContext.add(e);
   }
   
@@ -85,7 +85,7 @@ public abstract class GraphContext<V extends Element, E extends Element> {
    * @param label
    * @return
    */
-  public Edge<V> getEdge(String label) {
+  public Edge<H, V> getEdge(String label) {
     return edgeContext.get(label);
   }
   
@@ -174,7 +174,7 @@ public abstract class GraphContext<V extends Element, E extends Element> {
    * @param vertexName the vertex's name
    * @return the list of edges
    */
-  public List<Edge<V>> getEdges(Object vertexName) {
+  public List<Edge<H, V>> getEdges(Object vertexName) {
     return this.edgeContext.getEdges(vertexName);
   }
   
@@ -184,7 +184,7 @@ public abstract class GraphContext<V extends Element, E extends Element> {
    * @param vertex the vertex
    * @return the list of edges
    */
-  public List<Edge<V>> getEdges(V vertex) {
+  public List<Edge<H, V>> getEdges(V vertex) {
     return this.getEdges(vertex.getHandle());
   }
   

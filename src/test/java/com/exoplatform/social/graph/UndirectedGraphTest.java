@@ -30,8 +30,8 @@ import com.exoplatform.social.graph.Vertex;
 public class UndirectedGraphTest extends AbstractGraphTest {
 
   public void testAddVertex() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
     graph.addEdge("mary-john", maryV, johnV);
     
     assertNotNull(graph.getVertex(maryV.handle));
@@ -43,15 +43,15 @@ public class UndirectedGraphTest extends AbstractGraphTest {
   }
   
   public void testAddMore() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
+    Vertex<Object> maryV = graph.addVertex("mary");
     int numberOfConnections = 10;
-    Vertex v_ith = null;
-    Edge<Vertex> e_ith = null;
+    Vertex<Object> v_ith = null;
+    Edge<Object, Vertex<Object>> e_ith = null;
     
     //
     for(int i = 0; i< numberOfConnections; i++) {
       v_ith = graph.addVertex("user" + i);
-      e_ith = new Edge<Vertex>("mary-user" + i, maryV, v_ith);
+      e_ith = new Edge<Object, Vertex<Object>>("mary-user" + i, maryV, v_ith);
       graph.addEdge(e_ith);
     }
     
@@ -65,17 +65,17 @@ public class UndirectedGraphTest extends AbstractGraphTest {
   }
   
   public void testGetAdjacents() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e1 = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e1 = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     graph.addEdge(e1);
     
-    Vertex demoV = graph.addVertex("demo");
-    Edge<Vertex> e2 = new Edge<Vertex>("mary-demo", maryV, demoV);
+    Vertex<Object> demoV = graph.addVertex("demo");
+    Edge<Object, Vertex<Object>> e2 = new Edge<Object, Vertex<Object>>("mary-demo", maryV, demoV);
     graph.addEdge(e2);
     
     assertEquals(2, graph.getAdjacents("mary").size());
-    List<Vertex> vertices = graph.getAdjacents("mary");
+    List<Vertex<Object>> vertices = graph.getAdjacents("mary");
     assertEquals("john", vertices.get(0).handle);
     assertEquals("demo", vertices.get(1).handle);
     
@@ -86,17 +86,17 @@ public class UndirectedGraphTest extends AbstractGraphTest {
   }
   
   public void testGetEdges() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e1 = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e1 = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     graph.addEdge(e1);
     
-    Vertex demoV = graph.addVertex("demo");
-    Edge<Vertex> e2 = new Edge<Vertex>("mary-demo", maryV, demoV);
+    Vertex<Object> demoV = graph.addVertex("demo");
+    Edge<Object, Vertex<Object>> e2 = new Edge<Object, Vertex<Object>>("mary-demo", maryV, demoV);
     graph.addEdge(e2);
     
     assertEquals(2, graph.getAdjacents("mary").size());
-    List<Edge<Vertex>> edges = graph.getEdges("mary");
+    List<Edge<Object, Vertex<Object>>> edges = graph.getEdges("mary");
     assertEquals("mary-john", edges.get(0).label);
     assertEquals("mary-demo", edges.get(1).label);
     
@@ -105,13 +105,13 @@ public class UndirectedGraphTest extends AbstractGraphTest {
   }
   
   public void testRemoveEdge() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e1 = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e1 = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     graph.addEdge(e1);
     
-    Vertex demoV = graph.addVertex("demo");
-    Edge<Vertex> e2 = new Edge<Vertex>("mary-demo", maryV, demoV);
+    Vertex<Object> demoV = graph.addVertex("demo");
+    Edge<Object, Vertex<Object>> e2 = new Edge<Object, Vertex<Object>>("mary-demo", maryV, demoV);
     graph.addEdge(e2);
     
     graph.removeEdge(maryV, johnV);
@@ -123,9 +123,9 @@ public class UndirectedGraphTest extends AbstractGraphTest {
   }
   
   public void testRemoveVertex() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e1 = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e1 = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     graph.addEdge(e1);
 
     assertEquals(1, graph.getEdges("mary").size());
@@ -137,13 +137,13 @@ public class UndirectedGraphTest extends AbstractGraphTest {
   }
   
   public void testRemoVertex1() throws Exception {
-    Vertex maryV = graph.addVertex("mary");
-    Vertex johnV = graph.addVertex("john");
-    Edge<Vertex> e1 = new Edge<Vertex>("mary-john", maryV, johnV);
+    Vertex<Object> maryV = graph.addVertex("mary");
+    Vertex<Object> johnV = graph.addVertex("john");
+    Edge<Object, Vertex<Object>> e1 = new Edge<Object, Vertex<Object>>("mary-john", maryV, johnV);
     graph.addEdge(e1);
     
-    Vertex demoV = graph.addVertex("demo");
-    Edge<Vertex> e2 = new Edge<Vertex>("mary-demo", maryV, demoV);
+    Vertex<Object> demoV = graph.addVertex("demo");
+    Edge<Object, Vertex<Object>> e2 = new Edge<Object, Vertex<Object>>("mary-demo", maryV, demoV);
     graph.addEdge(e2);
     
     graph.removeVertex(demoV.keyType, demoV.handle);

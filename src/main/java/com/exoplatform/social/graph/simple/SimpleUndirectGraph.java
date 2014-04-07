@@ -14,24 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.graph;
+package com.exoplatform.social.graph.simple;
+
+import com.exoplatform.social.graph.Edge;
+import com.exoplatform.social.graph.UndirectedGraph;
+import com.exoplatform.social.graph.Vertex;
+import com.exoplatform.social.graph.VertexModel;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.com
- * Mar 24, 2014  
+ *          thanhvc@exoplatform.com
+ * Apr 7, 2014  
  */
-public class UndirectedGraph<H, V extends Vertex<H>, E extends Edge<H, V>> extends GraphContext<H, V, E> {
+public class SimpleUndirectGraph extends UndirectedGraph<Object, Vertex<Object>, Edge<Object,Vertex<Object>>>{
 
-  public UndirectedGraph(VertexModel<H, V, E> vertexModel) {
+  public SimpleUndirectGraph(VertexModel<Object, Vertex<Object>, Edge<Object, Vertex<Object>>> vertexModel) {
     super(vertexModel);
   }
 
-  @Override
-  public Edge<H, V> addEdge(String label, V inVertex, V outVertex) {
-    Edge<H, V> e = new Edge<H, V>(label, inVertex, outVertex);
-    this.addEdge(e);
-    return e;
-  }
 }

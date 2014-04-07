@@ -23,7 +23,7 @@ package com.exoplatform.social.graph;
  *          exo@exoplatform.com
  * Mar 23, 2014  
  */
-public interface VertexModel<V extends Element, E extends Element> {
+public interface VertexModel<H, V extends Vertex<H>, E extends Edge<H, V>> {
 
   /**
    * Gets the context of the vertex
@@ -31,13 +31,13 @@ public interface VertexModel<V extends Element, E extends Element> {
    * @param vertex the vertex
    * @return the context
    */
-  VertexContext<V, E> getContext(V vertex);
+  VertexContext<H, V, E> getContext(Vertex<H> vertex);
 
   /**
    * Creates the vertex what wrapped by vertex context
    * @param context the context wrapper
    * @return the vertex
    */
-  V create(VertexContext<V, E> context);
+  V create(VertexContext<H, V, E> context);
   
 }

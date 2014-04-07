@@ -18,9 +18,7 @@ package com.exoplatform.social.graph;
 
 import junit.framework.TestCase;
 
-import com.exoplatform.social.graph.EdgeContext;
-import com.exoplatform.social.graph.UndirectedGraph;
-import com.exoplatform.social.graph.Vertex;
+import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 import com.exoplatform.utils.LogWatch;
 
 /**
@@ -31,18 +29,18 @@ import com.exoplatform.utils.LogWatch;
  */
 public abstract class AbstractGraphTest extends TestCase {
   /** */
-  protected UndirectedGraph graph = null;
+  protected SimpleUndirectGraph graph = null;
   
   /** */
-  protected EdgeContext<Vertex> edgeContext = null;
+  protected EdgeContext<Object, Vertex<Object>, Edge<Object, Vertex<Object>>> edgeContext = null;
   
   /** */
   protected LogWatch watch = null;
   
   @Override
   protected void setUp() throws Exception {
-    graph = new UndirectedGraph(Vertex.MODEL);
-    edgeContext = new EdgeContext<Vertex>();
+    graph = new SimpleUndirectGraph(Vertex.MODEL);
+    edgeContext = new EdgeContext<Object, Vertex<Object>, Edge<Object, Vertex<Object>>>();
     watch = new LogWatch();
   }
   
