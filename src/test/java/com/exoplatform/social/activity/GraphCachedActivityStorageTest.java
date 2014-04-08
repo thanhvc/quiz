@@ -102,6 +102,57 @@ public class GraphCachedActivityStorageTest extends AbstractActivityTest {
     dump(feed);
   }
   
+  public void testGetConnection() throws Exception {
+    listOf(50, "mary", false, true);
+    
+    List<ExoSocialActivity> feed = cachedActivityStorage.getConnections("mary", 0, 20);
+    assertEquals(20, feed.size());
+    dump(feed);
+    
+  }
+  
+  public void testGetConnectionOffsetGreaterZero() throws Exception {
+    listOf(50, "mary", false, true);
+    
+    List<ExoSocialActivity> feed = cachedActivityStorage.getConnections("mary", 20, 20);
+    assertEquals(20, feed.size());
+    dump(feed);
+  }
+  
+  public void testGetOwner() throws Exception {
+    listOf(50, "mary", false, true);
+    
+    List<ExoSocialActivity> feed = cachedActivityStorage.getOwner("mary", 0, 20);
+    assertEquals(20, feed.size());
+    dump(feed);
+    
+  }
+  
+  public void testGetMySpacesOffsetGreaterZero() throws Exception {
+    listOf(50, "mary", false, true);
+    
+    List<ExoSocialActivity> feed = cachedActivityStorage.getMySpaces("mary", 20, 20);
+    assertEquals(20, feed.size());
+    dump(feed);
+  }
+  
+  public void testGetMySpaces() throws Exception {
+    listOf(50, "mary", false, true);
+    
+    List<ExoSocialActivity> feed = cachedActivityStorage.getMySpaces("mary", 0, 20);
+    assertEquals(20, feed.size());
+    dump(feed);
+    
+  }
+  
+  public void testGetOwnerOffsetGreaterZero() throws Exception {
+    listOf(50, "mary", false, true);
+    
+    List<ExoSocialActivity> feed = cachedActivityStorage.getOwner("mary", 20, 20);
+    assertEquals(20, feed.size());
+    dump(feed);
+  }
+  
   public void testAddMoreWithComment() throws Exception {
     List<ExoSocialActivity> list = listOf(15, "mary", false, true);
     

@@ -26,8 +26,11 @@ import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.DataChangeQueue;
 import com.exoplatform.social.activity.DataContext;
+import com.exoplatform.social.activity.DataFixedSizeListener;
 import com.exoplatform.social.activity.FixedSizeAlgorithm;
 import com.exoplatform.social.activity.PersistAlgorithm;
+import com.exoplatform.social.activity.Remover;
+import com.exoplatform.social.activity.Updater;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.ActivityStorage;
 import com.exoplatform.social.activity.storage.ActivityStreamStorage;
@@ -36,10 +39,10 @@ import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.DataModel;
 import com.exoplatform.social.activity.storage.cache.data.DataStatus;
-import com.exoplatform.social.activity.storage.cache.data.IdentityProvider;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
 import com.exoplatform.social.activity.storage.impl.ActivityStorageImpl.PersisterListener;
+import com.exoplatform.social.graph.Operator;
 import com.exoplatform.social.graph.Vertex;
 import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
@@ -59,7 +62,7 @@ public class CachedActivityStorage implements ActivityStorage {
   /** */
   final DataChangeListener<DataModel> persisterListener;
   /** */
-  final DataChangeListener<ExoSocialActivity> graphListener;
+  final GraphListener<ExoSocialActivity> graphListener;
   /** */
   final PersistAlgorithm<DataModel> fixedSizeAlgorithm;
   /** */
@@ -260,14 +263,14 @@ public class CachedActivityStorage implements ActivityStorage {
 
     ActivitiesListData data = this.activitiesCache.get(key);
     if (data == null) {
-      data = new ActivitiesListData();
+      data = new ActivitiesListData(key.label());
     }
     
     //
     for(int i = activities.size()-1; i >= 0; i--) {
       ExoSocialActivity a = activities.get(i);
       if (!data.contains(a.getId())) {
-        data.insertFirst(a.getId());
+        data.insertFirst(a.getId(), this.graphListener);
       }
       //
       if (!this.activityCache.containsKey(a.getId())) {
@@ -282,22 +285,107 @@ public class CachedActivityStorage implements ActivityStorage {
 
   @Override
   public List<ExoSocialActivity> getConnections(String remoteId, int offset, int limit) {
-    return null;
+    
+    List<ExoSocialActivity> got = null;
+    
+    ListActivitiesKey key =  new ListActivitiesKey(remoteId, StreamType.CONNECTION);
+    
+    if (this.activitiesCache.containsKey(key)) {
+      
+      //
+      ActivitiesListData data = this.activitiesCache.get(key);
+      
+      //
+      if (data != null) {
+        got = buildActivities(data, offset, limit);
+      } 
+      
+    } else {
+      got = this.storage.getConnections(remoteId, offset, limit);
+      //
+      ActivitiesListData data = buildIds(key, got);
+      //
+      this.activitiesCache.put(key, data);
+    }
+    return got;
   }
 
   @Override
   public List<ExoSocialActivity> getMySpaces(String remoteId, int offset, int limit) {
-    return null;
+    List<ExoSocialActivity> got = null;
+
+    ListActivitiesKey key = new ListActivitiesKey(remoteId, StreamType.MY_SPACES);
+
+    if (this.activitiesCache.containsKey(key)) {
+
+      //
+      ActivitiesListData data = this.activitiesCache.get(key);
+
+      //
+      if (data != null) {
+        got = buildActivities(data, offset, limit);
+      }
+
+    } else {
+      got = this.storage.getMySpaces(remoteId, offset, limit);
+      //
+      ActivitiesListData data = buildIds(key, got);
+      //
+      this.activitiesCache.put(key, data);
+    }
+    return got;
   }
 
   @Override
   public List<ExoSocialActivity> getSpace(String remoteId, int offset, int limit) {
-    return null;
+    List<ExoSocialActivity> got = null;
+    
+    ListActivitiesKey key =  new ListActivitiesKey(remoteId, StreamType.SPACE_STREAM);
+    
+    if (this.activitiesCache.containsKey(key)) {
+      
+      //
+      ActivitiesListData data = this.activitiesCache.get(key);
+      
+      //
+      if (data != null) {
+        got = buildActivities(data, offset, limit);
+      } 
+      
+    } else {
+      got = this.storage.getSpace(remoteId, offset, limit);
+      //
+      ActivitiesListData data = buildIds(key, got);
+      //
+      this.activitiesCache.put(key, data);
+    }
+    return got;
   }
 
   @Override
   public List<ExoSocialActivity> getOwner(String remoteId, int offset, int limit) {
-    return null;
+    List<ExoSocialActivity> got = null;
+
+    ListActivitiesKey key = new ListActivitiesKey(remoteId, StreamType.OWNER);
+
+    if (this.activitiesCache.containsKey(key)) {
+
+      //
+      ActivitiesListData data = this.activitiesCache.get(key);
+
+      //
+      if (data != null) {
+        got = buildActivities(data, offset, limit);
+      }
+
+    } else {
+      got = this.storage.getOwner(remoteId, offset, limit);
+      //
+      ActivitiesListData data = buildIds(key, got);
+      //
+      this.activitiesCache.put(key, data);
+    }
+    return got;
   }
 
   @Override
@@ -388,199 +476,52 @@ public class CachedActivityStorage implements ActivityStorage {
     }
   }
   
-  static class GraphListener<M extends ExoSocialActivity> implements DataChangeListener<M> {
+  static class GraphListener<M extends ExoSocialActivity> implements DataChangeListener<M>, DataFixedSizeListener  {
 
     /** */
-    final Map<String, ActivityData> activityCache;
+    final Operator<SimpleUndirectGraph, M> remover;
+
     /** */
-    final Map<ListActivitiesKey, ActivitiesListData> activitiesCache;
+    final Operator<SimpleUndirectGraph, M> updater;
+
     /** */
-    final SOCContext socContext;
-    
-    /** */
-    final SimpleUndirectGraph activityGraph;
-    
-    /** */
-    final SimpleUndirectGraph relationshipGraph;
-    
+    final SimpleUndirectGraph graph;
+
     public GraphListener(SOCContext socContext) {
-     this.activityCache = socContext.getActivityCache();
-     this.activitiesCache = socContext.getActivitiesCache();
-     this.activityGraph = socContext.getActivityCacheGraph();
-     this.relationshipGraph = socContext.getRelationshipCacheGraph();
-     this.socContext = socContext;
-    }
-    
-    /**
-     * 
-     * @param target
-     * @return
-     */
-    private boolean updateAllStream(ExoSocialActivity target) {
-      boolean success = false; 
-      
-      boolean isSpaceActivity = target.getPosterProviderId().equalsIgnoreCase(IdentityProvider.SPACE.getName());
-      success |= updateStream(target.getPosterId(), true, isSpaceActivity, target);
-      List<Vertex<Object>> vertices = this.relationshipGraph.getAdjacents(target.getPosterId());
-      
-      //add new activity for poster's stream, FEED, CONNECTION, MY SPACES, AND MY ACTIVITY
-      for(Vertex<Object> v : vertices) {
-        success |= updateStream(v.unwrap(String.class), false, isSpaceActivity, target);
-      }
-      
-      
-      return success;
-    }
-    
-    private boolean updateStream(String identityId, boolean isPoster, boolean isSpaceActivity, ExoSocialActivity target) {
-      boolean success = false;
-      ListActivitiesKey key = new ListActivitiesKey(identityId, StreamType.FEED);
-      success |= processGraph(isPoster, key, target);
-      //my connection
-      if (!isPoster) {
-        key = new ListActivitiesKey(identityId, StreamType.CONNECTION);
-        success |= processGraph(isPoster, key, target);
-      }
-      
-      //my space
-      if (isSpaceActivity) {
-        key = new ListActivitiesKey(identityId, StreamType.MY_SPACES);
-        success |= processGraph(isPoster, key, target);
-      }
-      
-      key = new ListActivitiesKey(identityId, StreamType.MY_ACTIVITIES);
-      success |= processGraph(isPoster, key, target);
-      
-      return success;
-    }
-    
-    /**
-     * 
-     * @param key
-     * @param target
-     * @return
-     */
-    private boolean processGraph(boolean isPoster, ListActivitiesKey key, ExoSocialActivity target) {
-      ActivitiesListData data = this.activitiesCache.get(key);
-      if (!isPoster && data == null)
-        return false;
-
-      if (data == null) {
-        data = new ActivitiesListData();
-        this.activitiesCache.put(key, data);
-
-        // TODO check edge is existing or not
-        // add edge and inVertex and outVertex
-        Vertex<Object> inVertex = this.activityGraph.getVertex(target.getId());
-        Vertex<Object> outVertex = this.activityGraph.addVertex(key);
-        this.activityGraph.addEdge(key.label(), inVertex, outVertex);
-
-      }
-      data.insertFirst(target.getId());
-      return true;
-    }
-    
-    @Override
-    public void onAdd(ExoSocialActivity target) {
-      if (target.isComment()) {
-        //1. Finds activityId vertex 
-        //2. Gets the adjacent of activityId vertex
-        //3. Gets from caching
-        //4. Remove, and put the top
-        ActivityData parentData = this.activityCache.get(target.getParentId());
-        if(parentData != null) {
-          updateAllStream(parentData.build());
-        }
-        
-      } else {
-        this.activityGraph.addVertex(target.getId());
-        //#1. Update stream of poster
-        //#2. Gets relationship of poster from relationshipCacheGraph
-        //#3. Build Key of AcrivityStream and find in activity caching if it represent in eXo Caching or not
-        //#4. If YES, 
-        updateAllStream(target);
-      }
+      remover = new Remover<M, SimpleUndirectGraph>(socContext);
+      updater = new Updater<M, SimpleUndirectGraph>(socContext);
+      this.graph = socContext.getActivityCacheGraph();
     }
 
     @Override
-    public void onRemove(ExoSocialActivity target) {
-      if (!target.isComment()) {
-        removeAllStream(target);
-      }
-    }
-    
-    /**
-     * 
-     * @param target
-     * @return
-     */
-    private boolean removeAllStream(ExoSocialActivity target) {
-      boolean success = false; 
-      
-      boolean isSpaceActivity = target.getPosterProviderId().equalsIgnoreCase(IdentityProvider.SPACE.getName());
-      success |= removeStream(target.getPosterId(), true, isSpaceActivity, target);
-      List<Vertex<Object>> vertices = this.relationshipGraph.getAdjacents(target.getPosterId());
-      
-      //add new activity for poster's stream, FEED, CONNECTION, MY SPACES, AND MY ACTIVITY
-      for(Vertex<Object> v : vertices) {
-        success |= removeStream(v.unwrap(String.class), false, isSpaceActivity, target);
-      }
-      
-      return success;
-    }
-    
-    private boolean removeStream(String identityId, boolean isPoster, boolean isSpaceActivity, ExoSocialActivity target) {
-      boolean success = false;
-      ListActivitiesKey key = new ListActivitiesKey(identityId, StreamType.FEED);
-      success |= removeGraph(isPoster, key, target);
-      //my connection
-      if (!isPoster) {
-        key = new ListActivitiesKey(identityId, StreamType.CONNECTION);
-        success |= removeGraph(isPoster, key, target);
-      }
-      
-      //my space
-      if (isSpaceActivity) {
-        key = new ListActivitiesKey(identityId, StreamType.MY_SPACES);
-        success |= removeGraph(isPoster, key, target);
-      }
-      
-      key = new ListActivitiesKey(identityId, StreamType.MY_ACTIVITIES);
-      success |= removeGraph(isPoster, key, target);
-      
-      return success;
-    }
-    
-    /**
-     * 
-     * @param key
-     * @param target
-     * @return
-     */
-    private boolean removeGraph(boolean isPoster, ListActivitiesKey key, ExoSocialActivity target) {
-      ActivitiesListData data = this.activitiesCache.get(key);
-      if (data != null) {
-        //TODO implement remove as sequence commands 
-        //this.activityGraph.removeEdge(key.label()).removeVertex(String.class, target.getId()).removeVertex(ListActivitiesKey.class, key)
-        this.activityGraph.removeEdge(key.label());
-        this.activityGraph.removeVertex(String.class, target.getId());
-        this.activityGraph.removeVertex(ListActivitiesKey.class, key);
-        data.remove(target.getId());
-        return true;
-      }
-      
-      return false;
+    public void onAdd(M target) {
+      updater.execute(this.graph, target);
     }
 
     @Override
-    public void onUpdate(ExoSocialActivity target) {
-      
+    public void onRemove(M target) {
+      remover.execute(graph, target);
     }
 
     @Override
-    public void onMove(ExoSocialActivity target) {
-      
+    public void onUpdate(M target) {
+
+    }
+
+    @Override
+    public void onMove(M target) {
+
     }
     
+    @Override
+    public void update(String inVertexId, String outVertexId) {
+      Vertex<Object> inVertex = this.graph.getVertex(inVertexId);
+      Vertex<Object> outVertex = this.graph.getVertex(outVertexId);
+      
+      if (inVertex != null && outVertex != null) {
+        this.graph.removeEdge(inVertex, outVertex);
+      }
+    }
+
   }
 }

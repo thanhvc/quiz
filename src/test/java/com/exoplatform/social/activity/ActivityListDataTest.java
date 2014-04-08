@@ -14,19 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity.storage.cache.data;
+package com.exoplatform.social.activity;
 
+import junit.framework.TestCase;
+
+import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Mar 12, 2014  
+ * Apr 8, 2014  
  */
-public enum StreamType {
-  FEED,
-  CONNECTION,
-  MY_SPACES,
-  SPACE_STREAM,
-  OWNER;
+public class ActivityListDataTest extends TestCase {
+
+  public void testInsertFirst() throws Exception {
+    ActivitiesListData data = new ActivitiesListData("mylist", 10);
+    
+    for(int i = 0; i< 100; i++) {
+      data.insertFirst("activity_" + i, null);
+    }
+    
+    assertEquals(10, data.size());
+    
+    
+  }
 }

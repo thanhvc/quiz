@@ -14,19 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity.storage.cache.data;
-
+package com.exoplatform.social.graph;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Mar 12, 2014  
+ * Apr 8, 2014  
  */
-public enum StreamType {
-  FEED,
-  CONNECTION,
-  MY_SPACES,
-  SPACE_STREAM,
-  OWNER;
+public interface Operator<G, M> {
+
+  /**
+   * Updates the graph from given model.
+   * 
+   * @param graph the graph updating
+   * @param model the model
+   */
+  void execute(G graph, M model);
+  
 }

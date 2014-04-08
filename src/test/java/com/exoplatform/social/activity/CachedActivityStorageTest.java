@@ -61,6 +61,42 @@ public class CachedActivityStorageTest extends AbstractActivityTest {
     assertEquals(20, feed.size());
   }
   
+  public void testGetMySpaces() throws Exception {
+    
+    listOf(50, "john", false, true);
+
+    List<ExoSocialActivity> myspaces = cachedActivityStorage.getMySpaces("john", 0, 20);
+    assertEquals(20, myspaces.size());
+    
+    //make sure get from caching
+    myspaces = cachedActivityStorage.getMySpaces("john", 0, 20);
+    assertEquals(20, myspaces.size());
+  }
+  
+  public void testGetOwner() throws Exception {
+    
+    listOf(50, "demo", false, true);
+
+    List<ExoSocialActivity> owner = cachedActivityStorage.getOwner("demo", 0, 20);
+    assertEquals(20, owner.size());
+    
+    //make sure get from caching
+    owner = cachedActivityStorage.getOwner("demo", 0, 20);
+    assertEquals(20, owner.size());
+  }
+  
+  public void testGetConnections() throws Exception {
+
+    listOf(50, "bob", false, true);
+
+    List<ExoSocialActivity> connections = cachedActivityStorage.getConnections("bob", 0, 20);
+    assertEquals(20, connections.size());
+
+    // make sure get from caching
+    connections = cachedActivityStorage.getConnections("bob", 0, 20);
+    assertEquals(20, connections.size());
+  }
+  
   public void testSaveActivities10() throws Exception {
     
     List<ExoSocialActivity> list = listOf(10, "mary", false, true);

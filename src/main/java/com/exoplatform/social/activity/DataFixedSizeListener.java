@@ -14,19 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity.storage.cache.data;
-
+package com.exoplatform.social.activity;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Mar 12, 2014  
+ * Apr 8, 2014  
  */
-public enum StreamType {
-  FEED,
-  CONNECTION,
-  MY_SPACES,
-  SPACE_STREAM,
-  OWNER;
+public interface DataFixedSizeListener {
+  
+  /**
+   * Handles when the activityId amount over fixedSize
+   * then, the graph must be remove the edge and vertex what keeps ListActivitiesKey
+   * 
+   * @param inVertexId in vertex id
+   * @param outVertexId out vertex id
+   */
+  public void update(String inVertexId, String outVertexId);
 }

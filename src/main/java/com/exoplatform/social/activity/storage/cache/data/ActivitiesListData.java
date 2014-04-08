@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.exoplatform.social.activity.DataFixedSizeListener;
+
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
@@ -29,14 +31,26 @@ import java.util.List;
  */
 @SuppressWarnings("serial")
 public class ActivitiesListData implements Serializable {
+  
+  final static int FIXED_SIZE = 100;
+  
+  final int maxSize;
   /** */
   final LinkedList<String> activityDataKeys;
+  /* **/
+  final String myKey;
+  
+  public ActivitiesListData(String key) {
+    this(key, FIXED_SIZE);
+  }
   
   /**
    * Constructors the empty instance.
    */
-  public ActivitiesListData() {
+  public ActivitiesListData(String key, int fixedSize) {
     activityDataKeys = new LinkedList<String>();
+    this.maxSize = fixedSize;
+    this.myKey = key;
   }
   
   /**
@@ -51,9 +65,11 @@ public class ActivitiesListData implements Serializable {
   
   /**
    * Inserts the id on the top of this list
-   * @param id
+   * 
+   * @param id the activity id
+   * @listener handles the case when is over fixed size
    */
-  public void insertFirst(String id) {
+  public void insertFirst(String id, DataFixedSizeListener listener) {
     //System.out.println("BEGIN::insert at the top: " + id);
     int position = this.activityDataKeys.indexOf(id);
     if (position > 0) {
@@ -63,7 +79,31 @@ public class ActivitiesListData implements Serializable {
       this.activityDataKeys.offerFirst(id);
     }
     
+    maintainFixedSize(listener);
     //System.out.println("END::insert at the top: " + id);
+  }
+  
+  /**
+   * Handles the case when the activity keys size over fixed size
+   * 
+   * @param listener the listener to handle
+   */
+  private void maintainFixedSize(DataFixedSizeListener listener) {
+    if (activityDataKeys.size() > maxSize) {
+      String outV = activityDataKeys.removeLast();
+      if (listener != null) {
+        listener.update(outV, myKey);
+      }
+    }
+  }
+  /**
+   * Determine can add more activity id on this
+   * makes sure it is not over fixed size
+   * 
+   * @return TRUE can add more Otherwise FALSE
+   */
+  public boolean canAddMore() {
+    return size() < this.maxSize;
   }
   
   /**
@@ -72,7 +112,7 @@ public class ActivitiesListData implements Serializable {
    */
   public void insertFirst(Collection<String> ids) {
     for(String id : ids) {
-      insertFirst(id);
+      insertFirst(id, null);
     }
   }
   
@@ -81,11 +121,14 @@ public class ActivitiesListData implements Serializable {
    * @param id
    */
   public void insertLast(String id) {
-    int position = this.activityDataKeys.indexOf(id);
-    if (position < activityDataKeys.size() - 1) {
-      this.activityDataKeys.remove(position);
+    if (canAddMore()) {
+      int position = this.activityDataKeys.indexOf(id);
+      if (position < activityDataKeys.size() - 1) {
+        this.activityDataKeys.remove(position);
+      }
+      this.activityDataKeys.offerLast(id);
     }
-    this.activityDataKeys.offerLast(id);
+    
   }
   
   /**
@@ -114,6 +157,14 @@ public class ActivitiesListData implements Serializable {
    */
   public void remove(String id) {
     this.activityDataKeys.remove(id);
+  }
+  
+  /**
+   * Returns size of the activities id
+   * @return
+   */
+  public int size() {
+    return activityDataKeys.size();
   }
   
 

@@ -55,7 +55,7 @@ public abstract class GraphContext<H, V extends Vertex<H>, E extends Edge<H, V>>
    * @param handle
    * @return
    */
-  public <T> V addVertex(H handle) {
+  public V addVertex(H handle) {
     return this.rootVertex.add(null, handle).vertex;
   }
   
