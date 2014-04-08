@@ -41,7 +41,7 @@ public class Vertex<H> implements Element {
    };
   
   /** */
-  final Object handle;
+  final H handle;
   
   /** */
   final Class<?> keyType;
@@ -60,7 +60,7 @@ public class Vertex<H> implements Element {
   }
   
   @Override
-  public Object getHandle() {
+  public H getHandle() {
     return this.handle;
   }
   

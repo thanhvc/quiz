@@ -25,13 +25,13 @@ package com.exoplatform.social.graph;
 public class Edge<H, V extends Vertex<H>> implements Element {
   
   /** */
-  final Object handle;
+  final H handle;
   
   /** */
   final Class<?> keyType;
   
   /** */
-  final String label;
+  final H label;
   
   /** */
   final ElementType type;
@@ -42,7 +42,7 @@ public class Edge<H, V extends Vertex<H>> implements Element {
   /** */
   final V outVertex;
   
-  public Edge(String label, V inVertex, V outVertex) {
+  public Edge(H label, V inVertex, V outVertex) {
     this.handle = label;
     this.keyType = this.handle.getClass();
     this.label = label;
@@ -51,7 +51,7 @@ public class Edge<H, V extends Vertex<H>> implements Element {
     this.type = ElementType.EDGE;
   }
   
-  public Edge(Object handle, String label, V inVertex, V outVertex) {
+  public Edge(H handle, H label, V inVertex, V outVertex) {
     this.handle = handle;
     this.keyType = this.handle.getClass();
     this.label = label;
@@ -74,7 +74,7 @@ public class Edge<H, V extends Vertex<H>> implements Element {
    * Gets the label of the edge
    * @return
    */
-  public String getLabel() {
+  public H getLabel() {
     return this.label;
   }
 

@@ -28,7 +28,7 @@ import java.util.LinkedList;
 @SuppressWarnings("serial")
 public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends LinkedList<VertexContext<H, V, E>> {
   /** */
-  final Object handle;
+  final H handle;
   
   /** the node is wrapped by vertex context*/
   final V vertex;
@@ -45,14 +45,14 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
     this.vertex = vertex;
   }
   
-  public VertexContext(GraphContext<H, V, E> graph, Object handle) {
+  public VertexContext(GraphContext<H, V, E> graph, H handle) {
     this.keyType = handle.getClass();
     this.handle = handle;
     this.graph = graph;
     this.vertex = graph.vertexModel.create(this);
   }
   
-  public Object getHandle() {
+  public H getHandle() {
     return this.handle;
   }
   
@@ -192,7 +192,7 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
    * @throws IndexOutOfBoundsException
    * @throws IllegalStateException
    */
-  public <T> VertexContext<H, V, E> add(Integer index, Object handle) throws NullPointerException, IndexOutOfBoundsException, IllegalStateException {
+  public <T> VertexContext<H, V, E> add(Integer index, H handle) throws NullPointerException, IndexOutOfBoundsException, IllegalStateException {
     if (handle == null) {
       throw new NullPointerException("No null name accepted");
     }

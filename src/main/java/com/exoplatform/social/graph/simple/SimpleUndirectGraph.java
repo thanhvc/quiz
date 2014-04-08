@@ -27,10 +27,10 @@ import com.exoplatform.social.graph.VertexModel;
  *          thanhvc@exoplatform.com
  * Apr 7, 2014  
  */
-public class SimpleUndirectGraph extends UndirectedGraph<Object, Vertex<Object>, Edge<Object,Vertex<Object>>>{
+public class SimpleUndirectGraph extends UndirectedGraph<Object, Vertex<Object>, Edge<Object, Vertex<Object>>>{
 
   public SimpleUndirectGraph(VertexModel<Object, Vertex<Object>, Edge<Object, Vertex<Object>>> vertexModel) {
-    super(vertexModel);
+    super(vertexModel, "root");
   }
 
 }

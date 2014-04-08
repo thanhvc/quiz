@@ -16,14 +16,8 @@
  */
 package com.exoplatform.social.tree;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
-
-import com.exoplatform.social.tree.NodeContext;
-import com.exoplatform.social.tree.NodeData;
-import com.exoplatform.social.tree.NodeState;
-import com.exoplatform.social.tree.SocialNode;
 
 import junit.framework.TestCase;
 

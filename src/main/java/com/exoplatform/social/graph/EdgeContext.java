@@ -32,13 +32,13 @@ import java.util.Map;
 class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
   //TODO improve this E extends Edge<H,V>
   /** the mapping vertex's handle and list of edges's handle */
-  final Map<Object, SoftReference<List<Object>>> vertexEdgeMap;
+  final Map<H, SoftReference<List<H>>> vertexEdgeMap;
   
   /**  the mapping edge's label and edge*/
   final Map<Object, SoftReference<Edge<H, V>>> incidences;
   
   public EdgeContext() {
-    vertexEdgeMap = new Hashtable<Object, SoftReference<List<Object>>>();
+    vertexEdgeMap = new Hashtable<H, SoftReference<List<H>>>();
     incidences = new Hashtable<Object, SoftReference<Edge<H, V>>>();
   }
   
@@ -65,8 +65,8 @@ class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
     }
     
     //process IN
-    SoftReference<List<Object>> softInSet = vertexEdgeMap.get(edge.inVertex.getHandle());
-    List<Object> inSet = softInSet != null ? softInSet.get() : new ArrayList<Object>();
+    SoftReference<List<H>> softInSet = vertexEdgeMap.get(edge.inVertex.getHandle());
+    List<H> inSet = softInSet != null ? softInSet.get() : new ArrayList<H>();
     if (softInSet == null) {
       this.vertexEdgeMap.put(edge.inVertex.getHandle(), softReference(inSet));  
     }
@@ -75,9 +75,9 @@ class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
     inSet.add(edge.handle);
 
     //process OUT
-    SoftReference<List<Object>> softOutSet = vertexEdgeMap.get(edge.outVertex.getHandle());
+    SoftReference<List<H>> softOutSet = vertexEdgeMap.get(edge.outVertex.getHandle());
     
-    List<Object> outSet = softOutSet != null ? softOutSet.get() : new ArrayList<Object>();
+    List<H> outSet = softOutSet != null ? softOutSet.get() : new ArrayList<H>();
     if (softOutSet == null) {
       this.vertexEdgeMap.put(edge.outVertex.getHandle(), softReference(outSet));
     }
@@ -94,18 +94,18 @@ class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
    * 
    * @param name the  vertex's handle or edge's label
    */
-  public void remove(String label) {
+  public void remove(H label) {
     Edge<H, V> v = this.incidences.get(label).get();
     if (v == null) return;
     
     //IN
-    List<Object> inSet = vertexEdgeMap.get(v.inVertex.getHandle()).get();
+    List<H> inSet = vertexEdgeMap.get(v.inVertex.getHandle()).get();
     if (inSet != null) {
       inSet.remove(v.handle);
     }
     
     //OUT
-    List<Object> outSet = vertexEdgeMap.get(v.outVertex.getHandle()).get();
+    List<H> outSet = vertexEdgeMap.get(v.outVertex.getHandle()).get();
     if (outSet != null) {
       outSet.remove(v.handle);
     }
@@ -120,12 +120,12 @@ class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
    * @param name the  vertex's handle or edge's label
    */
   public void remove(Object inHandle, Object outHandle) {
-    List<Object> in = vertexEdgeMap.get(inHandle).get();
-    List<Object> out = vertexEdgeMap.get(outHandle).get();
+    List<H> in = vertexEdgeMap.get(inHandle).get();
+    List<H> out = vertexEdgeMap.get(outHandle).get();
     
     //
-    List<Object> newIn = new ArrayList<Object>(in);
-    List<Object> newOut = new ArrayList<Object>(out);
+    List<H> newIn = new ArrayList<H>(in);
+    List<H> newOut = new ArrayList<H>(out);
     
     //intersection two lists
     if (newIn.retainAll(newOut)) {
@@ -145,15 +145,15 @@ class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
    * @return
    */
   public List<V> getAdjacents(Object name) {
-    SoftReference<List<Object>> softEdgeHandles = this.vertexEdgeMap.get(name);
+    SoftReference<List<H>> softEdgeHandles = this.vertexEdgeMap.get(name);
     //
     if (softEdgeHandles == null || softEdgeHandles.get() == null)
       return Collections.emptyList();
     
-    List<Object> edgeHandles = softEdgeHandles.get();
+    List<H> edgeHandles = softEdgeHandles.get();
 
     List<V> vertices = new ArrayList<V>(edgeHandles.size());
-    for (Object handle : edgeHandles) {
+    for (H handle : edgeHandles) {
       vertices.add(this.incidences.get(handle).get().getOutVertex(name));
     }
 
@@ -167,14 +167,14 @@ class EdgeContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
    */
   public List<Edge<H, V>> getEdges(Object name) {
     
-    SoftReference<List<Object>> softEdgeHandles = this.vertexEdgeMap.get(name);
+    SoftReference<List<H>> softEdgeHandles = this.vertexEdgeMap.get(name);
     //
     if (softEdgeHandles == null || softEdgeHandles.get() == null) return Collections.emptyList();
     
-    List<Object> edgeHandles = softEdgeHandles.get();
+    List<H> edgeHandles = softEdgeHandles.get();
     //
     List<Edge<H, V>> edges = new ArrayList<Edge<H, V>>(edgeHandles.size());
-    for(Object handle : edgeHandles) {
+    for(H handle : edgeHandles) {
       edges.add(this.incidences.get(handle).get());
     }
     

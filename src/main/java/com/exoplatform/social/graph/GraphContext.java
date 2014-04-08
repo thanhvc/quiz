@@ -31,14 +31,14 @@ public abstract class GraphContext<H, V extends Vertex<H>, E extends Edge<H, V>>
   /** */
   final VertexModel<H, V, E> vertexModel;
 
-  public GraphContext(VertexModel<H, V, E> vertexModel) {
+  public GraphContext(VertexModel<H, V, E> vertexModel, H handle) {
     this.vertexModel = vertexModel;
     this.edgeContext = new EdgeContext<H, V, E>();
-    this.rootVertex = new VertexContext<H, V, E>(this, "root");
+    this.rootVertex = new VertexContext<H, V, E>(this, handle);
     
   }
   
-  public abstract Edge<H, V> addEdge(String label, V inVertex, V outVertex);
+  public abstract Edge<H, V> addEdge(H label, V inVertex, V outVertex);
   
   /**
    * Adds new the vertex into the graph at the last positions
@@ -55,7 +55,7 @@ public abstract class GraphContext<H, V extends Vertex<H>, E extends Edge<H, V>>
    * @param handle
    * @return
    */
-  public <T> V addVertex(Object handle) {
+  public <T> V addVertex(H handle) {
     return this.rootVertex.add(null, handle).vertex;
   }
   
@@ -63,7 +63,7 @@ public abstract class GraphContext<H, V extends Vertex<H>, E extends Edge<H, V>>
    * Removes the vertex given the handle
    * @param handle the removed vertex's handle
    */
-  public void removeVertex(Class<?> type, Object handle) {
+  public void removeVertex(Class<?> type, H handle) {
   if (this.rootVertex.removeVertex(handle)) {
     List<Edge<H, V>> list = this.getEdges(handle);
     for(Edge<H, V> e : list) {
@@ -96,7 +96,7 @@ public abstract class GraphContext<H, V extends Vertex<H>, E extends Edge<H, V>>
    * @param name the edge's label or vertex's name
    * @param label the label of edge
    */
-  public void removeEdge(String name) {
+  public void removeEdge(H name) {
     edgeContext.remove(name);
   }
   

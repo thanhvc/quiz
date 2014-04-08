@@ -24,12 +24,12 @@ package com.exoplatform.social.graph;
  */
 public class UndirectedGraph<H, V extends Vertex<H>, E extends Edge<H, V>> extends GraphContext<H, V, E> {
 
-  public UndirectedGraph(VertexModel<H, V, E> vertexModel) {
-    super(vertexModel);
+  public UndirectedGraph(VertexModel<H, V, E> vertexModel, H handle) {
+    super(vertexModel, handle);
   }
 
   @Override
-  public Edge<H, V> addEdge(String label, V inVertex, V outVertex) {
+  public Edge<H, V> addEdge(H label, V inVertex, V outVertex) {
     Edge<H, V> e = new Edge<H, V>(label, inVertex, outVertex);
     this.addEdge(e);
     return e;
