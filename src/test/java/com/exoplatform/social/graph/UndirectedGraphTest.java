@@ -19,6 +19,7 @@ package com.exoplatform.social.graph;
 import java.util.List;
 
 import com.exoplatform.social.graph.Edge;
+import com.exoplatform.social.graph.GraphContext.Scope;
 import com.exoplatform.social.graph.Vertex;
 
 /**
@@ -131,9 +132,11 @@ public class UndirectedGraphTest extends AbstractGraphTest {
     assertEquals(1, graph.getEdges("mary").size());
     assertEquals(1, graph.getEdges("john").size());
     
-    graph.removeVertex(maryV.keyType, maryV.getHandle());
+    graph.removeVertex(maryV.keyType, maryV.getHandle(), Scope.ALL);
     assertEquals(0, graph.getEdges("mary").size());
     assertEquals(0, graph.getEdges("john").size());
+    graph.removeVertex(johnV.keyType, johnV.getHandle(), Scope.SINGLE);
+    assertNull(graph.getVertex("john"));
   }
   
   public void testRemoVertex1() throws Exception {
@@ -146,7 +149,7 @@ public class UndirectedGraphTest extends AbstractGraphTest {
     Edge<Object, Vertex<Object>> e2 = new Edge<Object, Vertex<Object>>("mary-demo", maryV, demoV);
     graph.addEdge(e2);
     
-    graph.removeVertex(demoV.keyType, demoV.handle);
+    graph.removeVertex(demoV.keyType, demoV.handle, Scope.ALL);
     
     assertEquals(1, graph.getEdges("mary").size());
     assertEquals(1, graph.getEdges("john").size());

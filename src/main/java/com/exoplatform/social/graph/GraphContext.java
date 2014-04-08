@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 public abstract class GraphContext<H, V extends Vertex<H>, E extends Edge<H, V>> {
+  public enum Scope {
+    ALL,
+    SINGLE
+  }
   /** */
   final EdgeContext<H, V, E> edgeContext;
   
@@ -62,15 +66,29 @@ public abstract class GraphContext<H, V extends Vertex<H>, E extends Edge<H, V>>
   /**
    * Removes the vertex given the handle
    * @param handle the removed vertex's handle
+   * @param scope ALL: remove it and all of its edges
+   *            SINGLE: remove it if its's edges size == zero  
    */
-  public void removeVertex(Class<?> type, H handle) {
-  if (this.rootVertex.removeVertex(handle)) {
-    List<Edge<H, V>> list = this.getEdges(handle);
-    for(Edge<H, V> e : list) {
-      this.removeEdge(e.getLabel());
-    }
+  public void removeVertex(Class<?> type, H handle, Scope scope) {
+    switch(scope) {
+    case ALL:
+      if (this.rootVertex.removeVertex(handle)) {
+        List<Edge<H, V>> list = this.getEdges(handle);
+        for (Edge<H, V> e : list) {
+          this.removeEdge(e.getLabel());
+        }
+      }
+      break;
+    case SINGLE:
+      List<Edge<H, V>> list = this.getEdges(handle);
+      if (list.size() == 0) {
+        this.rootVertex.removeVertex(handle);
+      }
+      break;
+    };
+    
   }
-  }
+
   
   /**
    * 

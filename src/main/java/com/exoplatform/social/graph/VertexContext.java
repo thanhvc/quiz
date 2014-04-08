@@ -127,9 +127,15 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
   public int getCount() {
     return size();
   }
-  
-  public <T> V getVertex(Object name) throws NullPointerException {
-    return get(name).vertex;
+  /**
+   * Gets the vertex by handle return NULL if it's not existing
+   * @param handle
+   * @return
+   * @throws NullPointerException
+   */
+  public <T> V getVertex(Object handle) throws NullPointerException {
+    VertexContext<H, V, E> found = get(handle);
+    return found == null ? null : found.vertex;
   }
   
   public V getVertex(int index) {
@@ -150,7 +156,7 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
   }
   
   /**
-   * Remove the node by specified name
+   * Remove the node by specified handle
    * @param name
    * @return
    * @throws NullPointerException
@@ -160,10 +166,10 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
   public <T> boolean removeVertex(Object name) throws NullPointerException, IllegalArgumentException, IllegalStateException {
     VertexContext<H, V, E> vertex = get(name);
     if(vertex == null) {
-      throw new IllegalArgumentException("Can remove non existent " + name + " child.");
+      return false;
     }
     
-    return vertex.removeVertex();
+    return removeVertex(vertex);
   }
   
   /**
@@ -171,9 +177,9 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
    * @return
    * @throws IllegalStateException
    */
-  public boolean removeVertex() throws IllegalStateException {
+  public boolean removeVertex(VertexContext<H, V, E> vertex) throws IllegalStateException {
     try {
-      this.remove(this);
+      this.remove(vertex);
       return true;
     } catch (Exception ex) {
       ex.printStackTrace();

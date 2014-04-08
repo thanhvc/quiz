@@ -23,6 +23,7 @@ import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
+import com.exoplatform.social.graph.GraphContext.Scope;
 import com.exoplatform.social.graph.Operator;
 import com.exoplatform.social.graph.Vertex;
 import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
@@ -156,8 +157,8 @@ public abstract class ActivityOperator<G extends SimpleUndirectGraph, M extends 
           //TODO implement remove as sequence commands 
           //this.activityGraph.removeEdge(key.label()).removeVertex(String.class, target.getId()).removeVertex(ListActivitiesKey.class, key)
           graph.removeEdge(key.label());
-          graph.removeVertex(String.class, target.getId());
-          graph.removeVertex(ListActivitiesKey.class, key);
+          graph.removeVertex(String.class, target.getId(), Scope.ALL);
+          graph.removeVertex(ListActivitiesKey.class, key, Scope.SINGLE);
           data.remove(target.getId());
           return true;
         }
