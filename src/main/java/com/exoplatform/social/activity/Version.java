@@ -25,9 +25,10 @@ package com.exoplatform.social.activity;
 public abstract class Version {
 
   /** */
-  final Long revision;
+  protected final Long revision;
   
   public Version(Long revision) {
     this.revision = revision;
   }
+  
 }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity;
+package com.exoplatform.social.activity.mock;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,8 +24,10 @@ import java.util.Map;
 
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.ActivityStorage;
+import com.exoplatform.social.activity.storage.ActivityStreamStorage;
 
 /**
+ * 
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
@@ -33,6 +35,29 @@ import com.exoplatform.social.activity.storage.ActivityStorage;
  */
 public class MockActivityStorageImpl implements ActivityStorage {
   
+//  Calendar calendar1 = Calendar.getInstance();
+//  Calendar calendar2 = Calendar.getInstance();
+//  calendar1.set(<your earlier date>);
+//  calendar2.set(<your current date>);
+//  long milliseconds1 = calendar1.getTimeInMillis();
+//  long milliseconds2 = calendar2.getTimeInMillis();
+//  long diff = milliseconds2 - milliseconds1;
+//  long diffSeconds = diff / 1000;
+//  long diffMinutes = diff / (60 * 1000);
+//  long diffHours = diff / (60 * 60 * 1000);
+//  long diffDays = diff / (24 * 60 * 60 * 1000);
+//  System.out.println("\nThe Date Different Example");
+//  System.out.println("Time in milliseconds: " + diff
+//+ " milliseconds.");
+//  System.out.println("Time in seconds: " + diffSeconds
+//+ " seconds.");
+//  System.out.println("Time in minutes: " + diffMinutes 
+//+ " minutes.");
+//  System.out.println("Time in hours: " + diffHours 
+//+ " hours.");
+//  System.out.println("Time in days: " + diffDays 
+//+ " days.");
+//}
   /** */
   final Map<String, LinkedList<ExoSocialActivity>> posterActivites;
   
@@ -43,7 +68,11 @@ public class MockActivityStorageImpl implements ActivityStorage {
   final Map<String, LinkedList<ExoSocialActivity>> activityIdComments;
   
   /** */
-  public MockActivityStorageImpl() {
+  final ActivityStreamStorage streamStorage;
+  
+  /** */
+  public MockActivityStorageImpl(ActivityStreamStorage streamStorage) {
+    this.streamStorage = streamStorage;
     activites = new LinkedList<ExoSocialActivity>();
     posterActivites = new HashMap<String, LinkedList<ExoSocialActivity>>();
     activityIdComments = new HashMap<String, LinkedList<ExoSocialActivity>>();
@@ -60,6 +89,10 @@ public class MockActivityStorageImpl implements ActivityStorage {
     my.addFirst(activity);
     
     activites.addFirst(activity);
+    
+    streamStorage.savePoster(activity);
+    streamStorage.save(activity);
+    
   }
 
   @Override
@@ -81,7 +114,8 @@ public class MockActivityStorageImpl implements ActivityStorage {
       whatsHot.addFirst(activity);
     }
     
-    
+    streamStorage.updateCommenter(activity);
+    streamStorage.update(activity, new String[]{});
   }
 
   @Override
@@ -103,6 +137,8 @@ public class MockActivityStorageImpl implements ActivityStorage {
     }
     
     my.remove(activity);
+    
+    streamStorage.delete(activity.getId());
   }
 
   @Override

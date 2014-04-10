@@ -40,20 +40,42 @@ public final class ActivityRefKey extends Version {
   
   @Override
   public String toString() {
-    return super.toString();
+    return "ActivityRefKey[identityId="+this.identityId+", activityId = " + this.activityId + ", revision = " + revision +"]";
   }
   
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ActivityRefKey)) {
+      return false;
+    }
+
+    ActivityRefKey that = (ActivityRefKey) o;
+
+    if (identityId != null ? !identityId.equals(that.identityId) : that.identityId != null) {
+      return false;
+    }
+    
+    if (type != null ? !type.equals(that.type) : that.type != null) {
+      return false;
+    }
+    
+    if (activityId != null ? !activityId.equals(that.activityId) : that.activityId != null) {
+      return false;
+    }
+
+    return true;
+  }
+
   @Override
   public int hashCode() {
-    return super.hashCode();
+    int result = 1;
+    result = 31 * result + (identityId != null ? identityId.hashCode() : 0);
+    result = 31 * result + (type != null ? type.hashCode() : 0);
+    result = 31 * result + (activityId != null ? activityId.hashCode() : 0);
+    return result;
   }
-  
-  @Override
-  public boolean equals(Object obj) {
-    return super.equals(obj);
-  }
-  
-  
-  
 
 }

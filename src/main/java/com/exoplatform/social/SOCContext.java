@@ -19,9 +19,11 @@ package com.exoplatform.social;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.exoplatform.social.activity.VersionChangeContext;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
+import com.exoplatform.social.activity.storage.ref.ActivityRefKey;
 import com.exoplatform.social.graph.Vertex;
 import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
@@ -34,8 +36,12 @@ import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 public class SOCContext {
   /** */
   final Map<String, ActivityData> activityCache;
+  
   /** */
   final Map<ListActivitiesKey, ActivitiesListData> activitiesCache;
+  
+  /** */
+  final VersionChangeContext<ActivityRefKey> versionContext;
   
   /** */
   final SimpleUndirectGraph activityCacheGraph;
@@ -43,7 +49,9 @@ public class SOCContext {
   /** */
   final SimpleUndirectGraph relationshipCacheGraph;
   
+  @SuppressWarnings("unchecked")
   public SOCContext() {
+    this.versionContext = new VersionChangeContext<ActivityRefKey>();
     this.activityCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
     this.relationshipCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
     this.activityCache = new HashMap<String, ActivityData>();
@@ -85,8 +93,12 @@ public class SOCContext {
     this.activityCache.clear();
     this.activityCacheGraph.clear();
     this.relationshipCacheGraph.clear();
+    this.versionContext.clearChanges();
   }
   
+  public VersionChangeContext<ActivityRefKey> getVersionContext() {
+    return versionContext;
+  }
   
 
 }

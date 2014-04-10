@@ -16,7 +16,6 @@
  */
 package com.exoplatform.social.activity.storage.ref;
 
-import com.exoplatform.social.activity.DataContext;
 import com.exoplatform.social.activity.PersistAlgorithm;
 import com.exoplatform.social.activity.Version;
 import com.exoplatform.social.activity.VersionChangeContext;
@@ -48,7 +47,7 @@ public class RefFixedSizeAlgorithm<T extends Version> implements PersistAlgorith
   
   @Override
   public boolean shoudldPersist() {
-    return context.getChanges().size() >= maxThreshold;
+    return context.getChangesSize() >= maxThreshold;
   }
 
 }

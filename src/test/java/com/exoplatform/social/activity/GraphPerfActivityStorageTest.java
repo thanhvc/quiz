@@ -32,7 +32,7 @@ public class GraphPerfActivityStorageTest extends AbstractActivityTest {
   final static int PERSISTER_THRESHOLD = 1000;
   
   @Override
-  public int getPersistThreshold() {
+  public int getPersistActivityThreshold() {
     return PERSISTER_THRESHOLD;
   }
 

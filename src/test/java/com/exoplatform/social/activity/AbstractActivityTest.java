@@ -23,6 +23,8 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import com.exoplatform.social.SOCContext;
+import com.exoplatform.social.activity.mock.MockActivityStorageImpl;
+import com.exoplatform.social.activity.mock.MockActivityStreamStorageImpl;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.cache.CachedActivityStorage;
 import com.exoplatform.social.activity.storage.cache.data.IdentityProvider;
@@ -35,16 +37,20 @@ import com.exoplatform.utils.LogWatch;
  * Mar 28, 2014  
  */
 public abstract class AbstractActivityTest extends TestCase {
-  
   /** */
-  final static int PERSISTER_THRESHOLD = 12;
-  
+  final static long DAY_MILISECONDS = 86400000; //24 x 60 x 60 x 1000
+  /** */
+  final static int PERSISTER_ACTIVITY_THRESHOLD = 12;
+  /** */
+  final static int PERSISTER_ACTIVITY_REF_THRESHOLD = 100;
   /** */
   protected SOCContext socContext;
   /** */
   protected CachedActivityStorage cachedActivityStorage;
   /** */
   protected MockActivityStorageImpl activityStorage;
+  /** */
+  protected MockActivityStreamStorageImpl streamStorage;
   /** */
   protected LogWatch watch = null;
   
@@ -56,26 +62,36 @@ public abstract class AbstractActivityTest extends TestCase {
     //
     socContext = new SOCContext();
     //
-    activityStorage = new MockActivityStorageImpl();
+    streamStorage = new MockActivityStreamStorageImpl(getPersistActivityRefThreshold(), socContext);
     //
-    this.cachedActivityStorage = new CachedActivityStorage(getPersistThreshold(), socContext, activityStorage);
+    activityStorage = new MockActivityStorageImpl(streamStorage);
+    //
+    this.cachedActivityStorage = new CachedActivityStorage(getPersistActivityThreshold(), socContext, activityStorage);
   }
   
   @Override
   protected void tearDown() throws Exception {
     super.tearDown();
+    socContext = null;
     this.cachedActivityStorage = null;
     activityStorage = null;
-    socContext = null;
     watch = null;
   }
   
   /**
-   * returns persist threshold
+   * returns persist activity threshold
    * @return
    */
-  public int getPersistThreshold() {
-    return PERSISTER_THRESHOLD;
+  public int getPersistActivityThreshold() {
+    return PERSISTER_ACTIVITY_THRESHOLD;
+  }
+  
+  /**
+   * returns persist activity ref threshold
+   * @return
+   */
+  public int getPersistActivityRefThreshold() {
+    return PERSISTER_ACTIVITY_REF_THRESHOLD;
   }
   
   public void clearAll() {
@@ -94,11 +110,18 @@ public abstract class AbstractActivityTest extends TestCase {
   }
   
   /**
-   * Build list of activity data
-   * @param n
-   * @param posterId
+   * Populate the activities
+   * if the given posterId is NULL, then it will make random posterId
+   * 
+   * Without the thread.sleep(...)
+   *  
+   * @param n number of activity will be populated
+   * @param posterId the poster activity: if providing NULL, then it will make random posterId
+   * @param isComment TRUE/ FALSE
+   * @param isSave need to invoke storage saving
+   * 
    * @return
-   * @throws InterruptedException 
+   * @throws InterruptedException
    */
   protected List<ExoSocialActivity> listOfPerf(int n, String posterId, boolean isComment, boolean isSave) throws InterruptedException {
     List<ExoSocialActivity> list = new LinkedList<ExoSocialActivity>();
@@ -112,6 +135,9 @@ public abstract class AbstractActivityTest extends TestCase {
                          .isComment(isComment)
                          .posterProviderId(IdentityProvider.USER.getName())
                          .take();
+      if (isComment) {
+        a.setCommenters(new String[] {"root", "john"});
+      }
       
       if (isSave) {
         cachedActivityStorage.saveActivity(a);
@@ -124,6 +150,18 @@ public abstract class AbstractActivityTest extends TestCase {
     return list;
   }
   
+  /**
+   * Populate the activities
+   * if the given posterId is NULL, then it will make random posterId
+   *  
+   * @param n number of activity will be populated
+   * @param posterId the poster activity: if providing NULL, then it will make random posterId
+   * @param isComment TRUE/ FALSE
+   * @param isSave need to invoke storage saving
+   * 
+   * @return
+   * @throws InterruptedException
+   */
   protected List<ExoSocialActivity> listOf(int n, String posterId, boolean isComment, boolean isSave) throws InterruptedException {
     List<ExoSocialActivity> list = new LinkedList<ExoSocialActivity>();
     ExoSocialActivity a = null;
@@ -136,6 +174,10 @@ public abstract class AbstractActivityTest extends TestCase {
                          .isComment(isComment)
                          .posterProviderId(IdentityProvider.USER.getName())
                          .take();
+      
+      if (isComment) {
+        a.setCommenters(new String[] {"root", "john"});
+      }
       
       if (isSave) {
         cachedActivityStorage.saveActivity(a);
@@ -162,6 +204,24 @@ public abstract class AbstractActivityTest extends TestCase {
     for(int i= 0, length = activities.size(); i < length; i++) {
       System.out.println(activities.get(i).toString());
     }
+  }
+  /**
+   * Calculate remaining activity ref what stored in version changes context.
+   * Excluding what persisted
+   * 
+   * @param n number of activity have been created
+   * 
+   * @return the number remaining changes
+   */
+  protected int numberOfRefKeys(int n) {
+    int remain = (n % PERSISTER_ACTIVITY_THRESHOLD);
+    //each user activity will have 2 activity ref, first for feed, second for owner
+    //activity persister will be trigger when number of activity creating =  PERSISTER_ACTIVITY_THRESHOLD activity creating.
+    //then PERSISTER_ACTIVITY_THRESHOLD x 2 = activity ref creating
+    
+    int totalExpected = 2 * (n == remain ? 0 : (n - remain));
+    //if totalExpected = PERSISTER_ACTIVITY_REF_THRESHOLD = 100
+    return totalExpected % PERSISTER_ACTIVITY_REF_THRESHOLD;
   }
   
   public static class ActivityBuilder {

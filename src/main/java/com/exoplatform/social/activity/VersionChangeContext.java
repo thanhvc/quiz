@@ -38,8 +38,7 @@ public final class VersionChangeContext<T extends Version> {
    * the data model what hold by caching
    * @param listener
    */
-  public VersionChangeContext() {
-  }
+  public VersionChangeContext() {}
   
   public boolean hasChanges() {
     return changes != null && changes.size() > 0;
@@ -88,9 +87,26 @@ public final class VersionChangeContext<T extends Version> {
     removeChange(target);
   }
   
+  /**
+   * Gets revision by given key.
+   * 
+   * @param key the given key
+   * @return the revision
+   */
+  public Long getRevision(T key) {
+    if (changes == null) {
+      return new Long(0);
+    }
+    return changes.get(key);
+  }
   
+  @SuppressWarnings("unchecked")
   public Map<T, Long> getChanges() {
-    return changes;
+    return changes == null ? Collections.EMPTY_MAP : this.changes;
+  }
+  
+  public int getChangesSize() {
+    return changes == null ? 0 : this.changes.size();
   }
   
   public Set<T> peekChanges() {
@@ -109,5 +125,12 @@ public final class VersionChangeContext<T extends Version> {
     } else {
       return Collections.emptySet();
     }
+  }
+  
+  public void clearChanges() {
+    if (changes != null) {
+      changes.clear();
+    }
+    
   }
 }

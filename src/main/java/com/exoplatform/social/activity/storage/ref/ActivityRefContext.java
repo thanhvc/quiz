@@ -17,6 +17,7 @@
 package com.exoplatform.social.activity.storage.ref;
 
 import com.exoplatform.social.activity.model.ExoSocialActivity;
+import com.exoplatform.social.activity.storage.cache.data.IdentityProvider;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
 
 /**
@@ -38,12 +39,20 @@ public class ActivityRefContext {
   final ExoSocialActivity comment;
   final PostType type;
   
-  public static Builder initActivity(boolean isUserOwner, ExoSocialActivity activity) {
-    return new Builder(isUserOwner, activity);
+  public static Builder initActivity(ExoSocialActivity activity) {
+    return new Builder(activity);
   }
   
-  public static Builder initComment(boolean isUserOwner, ExoSocialActivity activity, ExoSocialActivity comment) {
-    return new Builder(isUserOwner, activity, comment);
+  public static Builder initActivity(String identityId, ExoSocialActivity activity) {
+    return new Builder(identityId, activity);
+  }
+  
+  public static Builder initComment(ExoSocialActivity activity, ExoSocialActivity comment) {
+    return new Builder(activity, comment);
+  }
+  
+  public static Builder initComment(String identityId, ExoSocialActivity activity, ExoSocialActivity comment) {
+    return new Builder(identityId, activity, comment);
   }
   
   public ActivityRefContext(Builder builder) {
@@ -61,20 +70,25 @@ public class ActivityRefContext {
     public ExoSocialActivity comment;
     public PostType type;
     
-    public Builder(boolean isUserOwner, ExoSocialActivity activity, ExoSocialActivity comment) {
-      this.isUserOwner = isUserOwner;
-      this.type = PostType.COMMENT;
-      this.activity = activity;
-      this.comment = comment;
-      this.identityId = comment.getPosterId();
+    public Builder(ExoSocialActivity activity, ExoSocialActivity comment) {
+     this(activity.getPosterId(), activity, comment);
     }
     
-    public Builder(boolean isUserOwner, ExoSocialActivity activity) {
-      this.isUserOwner = isUserOwner;
-      this.type = PostType.ACTIVITY;
+    public Builder(String identityId, ExoSocialActivity activity, ExoSocialActivity comment) {
+      this.isUserOwner = IdentityProvider.USER.name().equalsIgnoreCase(activity.getPosterProviderId());
+      this.type = comment != null ? PostType.COMMENT : PostType.ACTIVITY;
       this.activity = activity;
-      this.comment = null;
-      this.identityId = activity.getPosterId();
+      this.comment = comment;
+      this.identityId = identityId;
+      
+    }
+    
+    public Builder(ExoSocialActivity activity) {
+      this(activity, null);
+    }
+    
+    public Builder(String identityId, ExoSocialActivity activity) {
+      this(identityId, activity, null);
     }
     
     public ActivityRefContext build() {
@@ -111,7 +125,7 @@ public class ActivityRefContext {
      * @return
      */
     public ActivityRefKey mySpacesKey() {
-      return !this.isUserOwner ? new ActivityRefKey(this, StreamType.MY_SPACES) : null;
+      return this.isUserOwner ? new ActivityRefKey(this, StreamType.MY_SPACES) : null;
     }
   }
 
