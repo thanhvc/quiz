@@ -16,15 +16,36 @@
  */
 package com.exoplatform.social.activity;
 
+
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
  * Mar 12, 2014  
  */
-public interface PersistAlgorithm<M> {
-
-  /** **/
-  boolean shoudldPersist();
+public class ActivityFixedSizeAlgorithm<M> implements PersistAlgorithm<M> {
+  /** */
+  final DataContext<M> context;
   
+  /** */
+  int persisterThreshold = 100;
+  
+  public ActivityFixedSizeAlgorithm(DataContext<M> context) {
+    this.context = context;
+  }
+  
+  public ActivityFixedSizeAlgorithm(DataContext<M> context, int persisterThreshold) {
+    this(context);
+    
+    if (persisterThreshold > 0) {
+      this.persisterThreshold = persisterThreshold;
+    }
+    
+  }
+  
+  @Override
+  public boolean shoudldPersist() {
+    return context.getChanges().size() >= persisterThreshold;
+  }
+
 }

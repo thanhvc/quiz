@@ -16,40 +16,18 @@
  */
 package com.exoplatform.social.activity;
 
-
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Mar 12, 2014  
+ * Apr 9, 2014  
  */
-public class FixedSizeAlgorithm<M> implements PersistAlgorithm<M> {
-  /** */
-  final DataContext<M> context;
-  
-  /** */
-  int persisterThreshold = 100;
-  
-  public FixedSizeAlgorithm(DataContext<M> context) {
-    this.context = context;
-  }
-  
-  public FixedSizeAlgorithm(DataContext<M> context, int persisterThreshold) {
-    this(context);
-    
-    if (persisterThreshold > 0) {
-      this.persisterThreshold = persisterThreshold;
-    }
-    
-  }
-  
-  @Override
-  public boolean shoudldPersist() {
-    return context.getChanges().size() >= persisterThreshold;
-  }
+public abstract class Version {
 
-  @Override
-  public DataContext<M> getDataContext() {
-    return null;
+  /** */
+  final Long revision;
+  
+  public Version(Long revision) {
+    this.revision = revision;
   }
 }

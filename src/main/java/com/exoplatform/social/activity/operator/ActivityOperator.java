@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity;
+package com.exoplatform.social.activity.operator;
 
 import java.util.Map;
 
 import com.exoplatform.social.SOCContext;
+import com.exoplatform.social.activity.DataFixedSizeListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
