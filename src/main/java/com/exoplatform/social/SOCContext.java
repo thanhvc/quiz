@@ -16,10 +16,14 @@
  */
 package com.exoplatform.social;
 
+import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
 
 import com.exoplatform.social.activity.VersionChangeContext;
+import com.exoplatform.social.activity.operator.Persister;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
@@ -48,6 +52,11 @@ public class SOCContext {
   
   /** */
   final SimpleUndirectGraph relationshipCacheGraph;
+  
+  /** */
+  private static ConcurrentHashMap<Object, SoftReference<Persister>> persisters;
+  /** */
+  private static ScheduledExecutorService scheduledExecutor;
   
   @SuppressWarnings("unchecked")
   public SOCContext() {
@@ -98,6 +107,14 @@ public class SOCContext {
   
   public VersionChangeContext<ActivityRefKey> getVersionContext() {
     return versionContext;
+  }
+  
+  public class ActivityTask implements Runnable {
+    public void run() {
+      try {
+      } catch (Throwable t) {
+      }
+    }
   }
   
 

@@ -83,7 +83,7 @@ public final class DataContext<M> {
   }
   
   public DataChangeQueue<M> getChanges() {
-    return changes;
+    return changes == null ? new DataChangeQueue<M>() : changes;
   }
   
   public List<DataChange<M>> peekChanges() {

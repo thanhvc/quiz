@@ -19,17 +19,20 @@ package com.exoplatform.social.activity.storage.cache;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.ArrayUtils;
 
 import com.exoplatform.social.SOCContext;
+import com.exoplatform.social.activity.ActivityFixedSizeAlgorithm;
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.DataChangeQueue;
 import com.exoplatform.social.activity.DataContext;
 import com.exoplatform.social.activity.DataFixedSizeListener;
-import com.exoplatform.social.activity.ActivityFixedSizeAlgorithm;
 import com.exoplatform.social.activity.PersistAlgorithm;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
+import com.exoplatform.social.activity.operator.Persister;
+import com.exoplatform.social.activity.operator.PersisterTimerTask;
 import com.exoplatform.social.activity.operator.Remover;
 import com.exoplatform.social.activity.operator.Updater;
 import com.exoplatform.social.activity.storage.ActivityStorage;
@@ -52,7 +55,9 @@ import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
  *          exo@exoplatform.com
  * Mar 12, 2014  
  */
-public class CachedActivityStorage implements ActivityStorage {
+public class CachedActivityStorage implements ActivityStorage, Persister {
+  /** */
+  static final long INTERVAL_ACTIVITY_PERSIST_THRESHOLD = 2000; //2m = 1000 x 2
   /** */
   static final String MENTION_CHAR = "@";
   /** */
@@ -65,6 +70,8 @@ public class CachedActivityStorage implements ActivityStorage {
   final GraphListener<ExoSocialActivity> graphListener;
   /** */
   final PersistAlgorithm<DataModel> fixedSizeAlgorithm;
+  /** */
+  final PersisterTimerTask timerTask;
   /** */
   final ActivityStreamStorage streamStorage;
   /** */
@@ -90,10 +97,16 @@ public class CachedActivityStorage implements ActivityStorage {
     this.graphListener = new GraphListener<ExoSocialActivity>(socContext);
     this.activityCache = socContext.getActivityCache();
     this.activitiesCache = socContext.getActivitiesCache();
+    timerTask = PersisterTimerTask.init().persister(this).wakeup(INTERVAL_ACTIVITY_PERSIST_THRESHOLD).timeUnit(TimeUnit.MILLISECONDS).build();
+    timerTask.start();
   }
   
-  private void persist() {
-    if (fixedSizeAlgorithm.shoudldPersist()) {
+  public void commit(boolean forceCommit) {
+    persistFixedSize(forceCommit);
+  }
+  
+  private void persistFixedSize(boolean forcePersist) {
+    if (fixedSizeAlgorithm.shoudldPersist() || forcePersist) {
       session.startSession();
       DataChangeQueue<DataModel> changes = context.getChanges();
       changes.broacast(this.persisterListener);
@@ -106,7 +119,7 @@ public class CachedActivityStorage implements ActivityStorage {
   public void saveActivity(ExoSocialActivity activity) {
     cachedListener.onAdd(activity);
     graphListener.onAdd(activity);
-    persist();
+    commit(false);
   }
 
   @Override
@@ -119,20 +132,20 @@ public class CachedActivityStorage implements ActivityStorage {
     cachedListener.onUpdate(activity);
     cachedListener.onAdd(comment);
     graphListener.onAdd(comment);
-    persist();
+    commit(false);
   }
 
   @Override
   public void update(ExoSocialActivity activity) {
     cachedListener.onUpdate(activity);
-    persist();
+    commit(false);
   }
   
   @Override
   public void deleteActivity(ExoSocialActivity activity) {
     cachedListener.onRemove(activity);
     graphListener.onRemove(activity);
-    persist();
+    commit(false);
   }
 
   @Override
@@ -148,7 +161,7 @@ public class CachedActivityStorage implements ActivityStorage {
     cachedListener.onUpdate(activityCache.get(activityId).build());
     cachedListener.onRemove(activityCache.get(commentId).build());
     
-    persist();
+    commit(false);
   }
   
   private String[] processCommenters(String[] commenters, String commenter, List<String> addedOrRemovedIds, boolean isAdded) {

@@ -17,11 +17,14 @@
 package com.exoplatform.social.activity.mock;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.PersistAlgorithm;
 import com.exoplatform.social.activity.VersionChangeContext;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
+import com.exoplatform.social.activity.operator.Persister;
+import com.exoplatform.social.activity.operator.PersisterTimerTask;
 import com.exoplatform.social.activity.storage.ActivityStreamStorage;
 import com.exoplatform.social.activity.storage.ref.ActivityRefContext;
 import com.exoplatform.social.activity.storage.ref.ActivityRefContext.Builder;
@@ -34,26 +37,31 @@ import com.exoplatform.social.activity.storage.ref.RefFixedSizeAlgorithm;
  *          exo@exoplatform.com
  * Apr 8, 2014  
  */
-public class MockActivityStreamStorageImpl implements ActivityStreamStorage {
+public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Persister {
   
+  /** */
+  static final long INTERVAL_ACTIVITY_PERSIST_THRESHOLD = 5000; //5m = 1000 x 5
+  /** */
   final VersionChangeContext<ActivityRefKey> context;
-  
+  /** */
   final SOCContext socContext;
-  
+  /** */
   final PersistAlgorithm<ActivityRefKey> refFixedSizeAlgorithm;
-  
+  /** */
+  final PersisterTimerTask timerTask;
+  /** */
   final static int persisterThreshold = 500;
   
   public MockActivityStreamStorageImpl(SOCContext socContext) {
     this(persisterThreshold, socContext);
-    
   }
   
   public MockActivityStreamStorageImpl(int maxPersisterThreshold, SOCContext socContext) {
     this.socContext = socContext;
     this.context = socContext.getVersionContext();
     this.refFixedSizeAlgorithm = new RefFixedSizeAlgorithm<ActivityRefKey>(this.context, maxPersisterThreshold);
-    
+    timerTask = PersisterTimerTask.init().persister(this).wakeup(INTERVAL_ACTIVITY_PERSIST_THRESHOLD).timeUnit(TimeUnit.MILLISECONDS).build();
+    timerTask.start();
   }
 
   @Override
@@ -144,6 +152,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage {
     commit(false);
   }
   
+  @Override
   public void commit(boolean forceCommit) {
     persistFixedSize(forceCommit);
   }
