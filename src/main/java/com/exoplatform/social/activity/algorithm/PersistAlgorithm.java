@@ -14,8 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity;
-
+package com.exoplatform.social.activity.algorithm;
 
 /**
  * Created by The eXo Platform SAS
@@ -23,29 +22,9 @@ package com.exoplatform.social.activity;
  *          exo@exoplatform.com
  * Mar 12, 2014  
  */
-public class ActivityFixedSizeAlgorithm<M> implements PersistAlgorithm<M> {
-  /** */
-  final DataContext<M> context;
-  
-  /** */
-  int persisterThreshold = 100;
-  
-  public ActivityFixedSizeAlgorithm(DataContext<M> context) {
-    this.context = context;
-  }
-  
-  public ActivityFixedSizeAlgorithm(DataContext<M> context, int persisterThreshold) {
-    this(context);
-    
-    if (persisterThreshold > 0) {
-      this.persisterThreshold = persisterThreshold;
-    }
-    
-  }
-  
-  @Override
-  public boolean shoudldPersist() {
-    return context.getChanges().size() >= persisterThreshold;
-  }
+public interface PersistAlgorithm<M> {
 
+  /** **/
+  boolean shoudldPersist();
+  
 }

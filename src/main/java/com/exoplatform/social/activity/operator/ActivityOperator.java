@@ -19,11 +19,11 @@ package com.exoplatform.social.activity.operator;
 import java.util.Map;
 
 import com.exoplatform.social.SOCContext;
-import com.exoplatform.social.activity.DataFixedSizeListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
+import com.exoplatform.social.activity.storage.cache.data.StreamFixedSizeListener;
 import com.exoplatform.social.graph.GraphContext.Scope;
 import com.exoplatform.social.graph.Operator;
 import com.exoplatform.social.graph.Vertex;
@@ -71,7 +71,7 @@ public abstract class ActivityOperator<G extends SimpleUndirectGraph, M extends 
      */
     abstract boolean remove(SimpleUndirectGraph graph, ListActivitiesKey key, ExoSocialActivity target);
     
-    public static class UPDATE extends OperatorContext implements DataFixedSizeListener {
+    public static class UPDATE extends OperatorContext implements StreamFixedSizeListener {
 
       /** */
       final SimpleUndirectGraph graph;

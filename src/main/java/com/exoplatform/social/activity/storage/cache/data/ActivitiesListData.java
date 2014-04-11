@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.exoplatform.social.activity.DataFixedSizeListener;
 
 /**
  * Created by The eXo Platform SAS
@@ -69,7 +68,7 @@ public class ActivitiesListData implements Serializable {
    * @param id the activity id
    * @listener handles the case when is over fixed size
    */
-  public void insertFirst(String id, DataFixedSizeListener listener) {
+  public void insertFirst(String id, StreamFixedSizeListener listener) {
     //System.out.println("BEGIN::insert at the top: " + id);
     int position = this.activityDataKeys.indexOf(id);
     if (position > 0) {
@@ -88,7 +87,7 @@ public class ActivitiesListData implements Serializable {
    * 
    * @param listener the listener to handle
    */
-  private void maintainFixedSize(DataFixedSizeListener listener) {
+  private void maintainFixedSize(StreamFixedSizeListener listener) {
     if (activityDataKeys.size() > maxSize) {
       String outV = activityDataKeys.removeLast();
       if (listener != null) {

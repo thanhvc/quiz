@@ -20,8 +20,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.exoplatform.social.SOCContext;
-import com.exoplatform.social.activity.PersistAlgorithm;
 import com.exoplatform.social.activity.VersionChangeContext;
+import com.exoplatform.social.activity.algorithm.PersistAlgorithm;
+import com.exoplatform.social.activity.algorithm.RefFixedSizeAlgorithm;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.operator.Persister;
 import com.exoplatform.social.activity.operator.PersisterTimerTask;
@@ -29,7 +30,6 @@ import com.exoplatform.social.activity.storage.ActivityStreamStorage;
 import com.exoplatform.social.activity.storage.ref.ActivityRefContext;
 import com.exoplatform.social.activity.storage.ref.ActivityRefContext.Builder;
 import com.exoplatform.social.activity.storage.ref.ActivityRefKey;
-import com.exoplatform.social.activity.storage.ref.RefFixedSizeAlgorithm;
 
 /**
  * Created by The eXo Platform SAS

@@ -24,12 +24,11 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang.ArrayUtils;
 
 import com.exoplatform.social.SOCContext;
-import com.exoplatform.social.activity.ActivityFixedSizeAlgorithm;
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.DataChangeQueue;
 import com.exoplatform.social.activity.DataContext;
-import com.exoplatform.social.activity.DataFixedSizeListener;
-import com.exoplatform.social.activity.PersistAlgorithm;
+import com.exoplatform.social.activity.algorithm.ActivityFixedSizeAlgorithm;
+import com.exoplatform.social.activity.algorithm.PersistAlgorithm;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.operator.Persister;
 import com.exoplatform.social.activity.operator.PersisterTimerTask;
@@ -43,6 +42,7 @@ import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.DataModel;
 import com.exoplatform.social.activity.storage.cache.data.DataStatus;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
+import com.exoplatform.social.activity.storage.cache.data.StreamFixedSizeListener;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
 import com.exoplatform.social.activity.storage.impl.ActivityStorageImpl.PersisterListener;
 import com.exoplatform.social.graph.Operator;
@@ -489,7 +489,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     }
   }
   
-  static class GraphListener<M extends ExoSocialActivity> implements DataChangeListener<M>, DataFixedSizeListener  {
+  static class GraphListener<M extends ExoSocialActivity> implements DataChangeListener<M>, StreamFixedSizeListener  {
 
     /** */
     final Operator<SimpleUndirectGraph, M> remover;

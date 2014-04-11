@@ -14,9 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity.storage.ref;
+package com.exoplatform.social.activity.algorithm;
 
-import com.exoplatform.social.activity.PersistAlgorithm;
 import com.exoplatform.social.activity.Version;
 import com.exoplatform.social.activity.VersionChangeContext;
 

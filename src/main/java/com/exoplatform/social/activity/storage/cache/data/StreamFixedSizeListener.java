@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity;
+package com.exoplatform.social.activity.storage.cache.data;
 
 /**
  * Created by The eXo Platform SAS
@@ -22,7 +22,7 @@ package com.exoplatform.social.activity;
  *          exo@exoplatform.com
  * Apr 8, 2014  
  */
-public interface DataFixedSizeListener {
+public interface StreamFixedSizeListener {
   
   /**
    * Handles when the activityId amount over fixedSize
