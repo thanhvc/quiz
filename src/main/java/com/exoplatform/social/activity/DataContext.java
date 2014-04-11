@@ -62,14 +62,6 @@ public final class DataContext<M> {
   }
   
   /**
-   * Moves the model
-   * @param target
-   */
-  public void move(M target) {
-    addChange(new DataChange.Move<M>(target));
-  }
-  
-  /**
    * Removes the model
    * @param target
    */

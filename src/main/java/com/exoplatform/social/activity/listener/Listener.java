@@ -14,50 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity;
+package com.exoplatform.social.activity.listener;
+
+import com.exoplatform.social.SOCContext;
+import com.exoplatform.social.activity.DataChangeListener;
+import com.exoplatform.social.activity.model.ExoSocialActivity;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Mar 12, 2014  
+ * Apr 11, 2014  
  */
-public interface DataChangeListener<M> {
-  /**
-   * A model is added
-   * @param target the added model
-   */
-  void onAdd(M target);
+public class Listener {
   
-  /**
-   * A model is removed
-   * @param target
-   */
-  void onRemove(M target);
-  
-  /**
-   * A model is updated
-   * @param target
-   */
-  void onUpdate(M target);
-  
-  class Base<M> implements DataChangeListener<M> {
+  public static DataChangeListener<ExoSocialActivity> CACHING = new CachedListener<ExoSocialActivity>(SOCContext.instance());
 
-    @Override
-    public void onAdd(M target) {
-      
-    }
-
-    @Override
-    public void onRemove(M target) {
-      
-    }
-
-    @Override
-    public void onUpdate(M target) {
-      
-    }
-  }
-  
-
+  public static GraphListener<ExoSocialActivity> GRAPH = new GraphListener<ExoSocialActivity>(SOCContext.instance());
 }

@@ -63,9 +63,4 @@ public class DataChangeQueue<M> extends LinkedList<DataChange<M>> implements Dat
     add(new DataChange.Update<M>(target));
   }
 
-  @Override
-  public void onMove(M target) {
-    
-  }
-
 }

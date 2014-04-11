@@ -71,23 +71,6 @@ public abstract class DataChange<M> {
 
   }
   
-  public static final class Move<M> extends DataChange<M> {
-
-    public Move(M model) {
-      super(model);
-    }
-
-    @Override
-    protected void dispatch(DataChangeListener<M> listener) {
-      listener.onMove(this.target);
-    }
-
-    @Override
-    public String toString() {
-      return "DataChange.Move[target:" + target + "]";
-    }
-  }
-  
   public static final class Update<M> extends DataChange<M> {
 
     public Update(M model) {
@@ -96,7 +79,7 @@ public abstract class DataChange<M> {
 
     @Override
     protected void dispatch(DataChangeListener<M> listener) {
-      listener.onMove(this.target);
+      listener.onUpdate(this.target);
     }
 
     @Override

@@ -19,9 +19,11 @@ package com.exoplatform.social;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.exoplatform.social.activity.DataContext;
 import com.exoplatform.social.activity.storage.SOCSession;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
+import com.exoplatform.social.activity.storage.cache.data.DataModel;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
 import com.exoplatform.social.activity.storage.stream.StreamUpdater;
 import com.exoplatform.social.graph.Vertex;
@@ -34,6 +36,7 @@ import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
  * Mar 27, 2014  
  */
 public class SOCContext {
+  private static SOCContext instance;
   /** */
   final SOCSession session;
   /** */
@@ -43,7 +46,8 @@ public class SOCContext {
   
   /** */
   final Map<ListActivitiesKey, ActivitiesListData> activitiesCache;
-  
+  /** */
+  final DataContext<DataModel> context;
   
   
   /** */
@@ -55,6 +59,7 @@ public class SOCContext {
   @SuppressWarnings("unchecked")
   public SOCContext() {
     this.session = new SOCSession();
+    this.context = new DataContext<DataModel>();
     this.streamUpdater = new StreamUpdater();
     this.activityCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
     this.relationshipCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
@@ -114,6 +119,17 @@ public class SOCContext {
 
   public SOCSession getSession() {
     return session;
+  }
+
+  public DataContext<DataModel> getDataContext() {
+    return this.context;
+  }
+
+  public static SOCContext instance() {
+    if (instance == null) {
+      instance = new SOCContext();
+    }
+    return instance;
   }
 
 }

@@ -473,11 +473,6 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
       
       context.update(data.buildModel());
     }
-
-    @Override
-    public void onMove(ExoSocialActivity target) {
-      
-    }
   }
   
   static class GraphListener<M extends ExoSocialActivity> implements DataChangeListener<M>, StreamFixedSizeListener  {
@@ -509,11 +504,6 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
 
     @Override
     public void onUpdate(M target) {
-
-    }
-
-    @Override
-    public void onMove(M target) {
 
     }
     

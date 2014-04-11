@@ -157,13 +157,10 @@ public class ActivityStorageImpl implements ActivityStorage {
     public void onUpdate(DataModel target) {
       //System.out.println("Persister::onUpdate");
       ActivityData data = activityCache.get(target.getHandle());
-      this.storage.update(data.build());
-      data.setStatus(DataStatus.PERSISTENTED);
-    }
-
-    @Override
-    public void onMove(DataModel target) {
-      //System.out.println("Persister::onMove");
+      if (data != null) {
+        this.storage.update(data.build());
+        data.setStatus(DataStatus.PERSISTENTED);
+      }
     }
   }
 }
