@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 
 import com.exoplatform.social.activity.mock.MockPersister;
-import com.exoplatform.social.activity.operator.PersisterTimerTask;
+import com.exoplatform.social.activity.persister.PersisterTask;
 
 /**
  * Created by The eXo Platform SAS
@@ -32,7 +32,7 @@ import com.exoplatform.social.activity.operator.PersisterTimerTask;
 public class PersisterTimerTaskTest extends TestCase {
   
   public void testPersisterTimerTask() throws Exception {
-    PersisterTimerTask timerTask = PersisterTimerTask.init().persister(new MockPersister()).wakeup(1000).timeUnit(TimeUnit.MILLISECONDS).build();
+    PersisterTask timerTask = PersisterTask.init().persister(new MockPersister()).wakeup(1000).timeUnit(TimeUnit.MILLISECONDS).build();
     
     timerTask.start();
     

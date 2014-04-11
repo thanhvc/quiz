@@ -41,7 +41,7 @@ public class DataChangeQueue<M> extends LinkedList<DataChange<M>> implements Dat
    * 
    * @param listener
    */
-  public void broacast(DataChangeListener<M> listener) {
+  public void broadcast(DataChangeListener<M> listener) {
     for(DataChange<M> change : this) {
       change.dispatch(listener);
     }

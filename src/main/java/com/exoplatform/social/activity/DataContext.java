@@ -17,7 +17,6 @@
 package com.exoplatform.social.activity;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,6 +39,10 @@ public final class DataContext<M> {
   
   public boolean hasChanges() {
     return changes != null && changes.size() > 0;
+  }
+  
+  public int getChangesSize() {
+    return changes != null ? changes.size() : 0;
   }
   
   private void addChange(DataChange<M> change) {
@@ -94,13 +97,13 @@ public final class DataContext<M> {
     }
   }
 
-  public List<DataChange<M>> popChanges() {
+  public DataChangeQueue<M> popChanges() {
     if (hasChanges()) {
-      LinkedList<DataChange<M>> tmp = changes;
+      DataChangeQueue<M> tmp = changes;
       changes = null;
       return tmp;
     } else {
-      return Collections.emptyList();
+      return null;
     }
   }
 }

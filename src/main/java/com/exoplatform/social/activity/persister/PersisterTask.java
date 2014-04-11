@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity.operator;
+package com.exoplatform.social.activity.persister;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * Created by The eXo Platform SAS
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  *          exo@exoplatform.com
  * Apr 10, 2014  
  */
-public class PersisterTimerTask {
+public class PersisterTask implements PersistAlgorithm {
   /** */
   final Persister persister;
   /** */
@@ -36,13 +37,16 @@ public class PersisterTimerTask {
   /** */
   final TimeUnit timeUnit;
   /** */
+  final long maxFixedSize;
+  /** */
   ScheduledExecutorService scheduledExecutor;
   
   public static Builder init() {
     return new Builder();
   }
-  public PersisterTimerTask(Builder builder) {
+  public PersisterTask(Builder builder) {
     this.wakeupInterval = builder.wakeupInterval;
+    this.maxFixedSize = builder.maxFixedSize;
     this.persister = builder.persister;
     this.timeUnit = builder.timeUnit == null ? TimeUnit.MILLISECONDS : builder.timeUnit;
     this.task = new Task();
@@ -75,6 +79,7 @@ public class PersisterTimerTask {
     public Persister persister;
     public long wakeupInterval;
     public TimeUnit timeUnit;
+    public long maxFixedSize;
     
     public Builder() {}
     
@@ -93,8 +98,18 @@ public class PersisterTimerTask {
       return this;
     }
     
-    public PersisterTimerTask build() {
-      return new PersisterTimerTask(this);
+    public Builder maxFixedSize(long maxFixedSize) {
+      this.maxFixedSize = maxFixedSize;
+      return this;
     }
+    
+    public PersisterTask build() {
+      return new PersisterTask(this);
+    }
+  }
+
+  @Override
+  public boolean shoudldPersist(int changedSize) {
+    return changedSize >= maxFixedSize;
   }
 }

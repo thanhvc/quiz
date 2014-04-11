@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 
 import com.exoplatform.social.activity.VersionChangeContext;
-import com.exoplatform.social.activity.operator.Persister;
+import com.exoplatform.social.activity.persister.Persister;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;

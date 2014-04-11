@@ -27,13 +27,11 @@ import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.DataChangeQueue;
 import com.exoplatform.social.activity.DataContext;
-import com.exoplatform.social.activity.algorithm.ActivityFixedSizeAlgorithm;
-import com.exoplatform.social.activity.algorithm.PersistAlgorithm;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
-import com.exoplatform.social.activity.operator.Persister;
-import com.exoplatform.social.activity.operator.PersisterTimerTask;
 import com.exoplatform.social.activity.operator.Remover;
 import com.exoplatform.social.activity.operator.Updater;
+import com.exoplatform.social.activity.persister.Persister;
+import com.exoplatform.social.activity.persister.PersisterTask;
 import com.exoplatform.social.activity.storage.ActivityStorage;
 import com.exoplatform.social.activity.storage.ActivityStreamStorage;
 import com.exoplatform.social.activity.storage.SOCSession;
@@ -69,9 +67,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   /** */
   final GraphListener<ExoSocialActivity> graphListener;
   /** */
-  final PersistAlgorithm<DataModel> fixedSizeAlgorithm;
-  /** */
-  final PersisterTimerTask timerTask;
+  final PersisterTask timerTask;
   /** */
   final ActivityStreamStorage streamStorage;
   /** */
@@ -91,25 +87,33 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     this.session = new SOCSession();
     this.socContext = socContext;
     this.context = new  DataContext<DataModel>();
-    this.fixedSizeAlgorithm = new ActivityFixedSizeAlgorithm<DataModel>(context, persisterThreshold);
-    this.cachedListener = new CachedListener<ExoSocialActivity>(context, socContext, fixedSizeAlgorithm);
+    this.cachedListener = new CachedListener<ExoSocialActivity>(context, socContext);
     this.persisterListener = new PersisterListener(this.storage, this.session, socContext);
     this.graphListener = new GraphListener<ExoSocialActivity>(socContext);
     this.activityCache = socContext.getActivityCache();
     this.activitiesCache = socContext.getActivitiesCache();
-    timerTask = PersisterTimerTask.init().persister(this).wakeup(INTERVAL_ACTIVITY_PERSIST_THRESHOLD).timeUnit(TimeUnit.MILLISECONDS).build();
+    timerTask = PersisterTask.init()
+                             .persister(this)
+                             .wakeup(INTERVAL_ACTIVITY_PERSIST_THRESHOLD)
+                             .timeUnit(TimeUnit.MILLISECONDS)
+                             .maxFixedSize(persisterThreshold)
+                             .build();
     timerTask.start();
   }
   
+  @Override
   public void commit(boolean forceCommit) {
     persistFixedSize(forceCommit);
   }
   
   private void persistFixedSize(boolean forcePersist) {
-    if (fixedSizeAlgorithm.shoudldPersist() || forcePersist) {
+    if (timerTask.shoudldPersist(context.getChangesSize()) || forcePersist) {
       session.startSession();
-      DataChangeQueue<DataModel> changes = context.getChanges();
-      changes.broacast(this.persisterListener);
+      DataChangeQueue<DataModel> changes = context.popChanges();
+      if (changes != null) {
+        changes.broadcast(this.persisterListener);
+      }
+      
       context.popChanges();
       session.stopSession();
     }
@@ -431,18 +435,14 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     
     final DataContext<DataModel> context;
     /** */
-    final PersistAlgorithm<DataModel> fixedSizeAlgorithm;
-    /** */
     final Map<String, ActivityData> activityCache;
     /** */
     final Map<ListActivitiesKey, ActivitiesListData> activitiesCache;
     /** */
     final SOCContext socContext;
     
-    public CachedListener(DataContext<DataModel> context, SOCContext socContext,
-                          PersistAlgorithm<DataModel> fixedSizeAlgorithm) {
+    public CachedListener(DataContext<DataModel> context, SOCContext socContext) {
       this.context = context;
-      this.fixedSizeAlgorithm = fixedSizeAlgorithm;
       this.activityCache = socContext.getActivityCache();
       this.activitiesCache = socContext.getActivitiesCache();
       this.socContext = socContext;

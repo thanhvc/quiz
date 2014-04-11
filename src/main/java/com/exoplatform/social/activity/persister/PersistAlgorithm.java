@@ -14,21 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity.operator;
+package com.exoplatform.social.activity.persister;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Apr 10, 2014  
+ * Mar 12, 2014  
  */
-public interface Persister {
-  
-  /**
-   * Commit to data storage
-   *   
-   * @param forceCommit
-   */
-  void commit(boolean forceCommit);
+public interface PersistAlgorithm {
 
+  /** **/
+  boolean shoudldPersist(int changedSize);
+  
 }

@@ -16,7 +16,7 @@
  */
 package com.exoplatform.social.activity.mock;
 
-import com.exoplatform.social.activity.operator.Persister;
+import com.exoplatform.social.activity.persister.Persister;
 
 /**
  * Created by The eXo Platform SAS

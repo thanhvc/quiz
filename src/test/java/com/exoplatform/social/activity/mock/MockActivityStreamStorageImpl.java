@@ -21,11 +21,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.VersionChangeContext;
-import com.exoplatform.social.activity.algorithm.PersistAlgorithm;
-import com.exoplatform.social.activity.algorithm.RefFixedSizeAlgorithm;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
-import com.exoplatform.social.activity.operator.Persister;
-import com.exoplatform.social.activity.operator.PersisterTimerTask;
+import com.exoplatform.social.activity.persister.Persister;
+import com.exoplatform.social.activity.persister.PersisterTask;
 import com.exoplatform.social.activity.storage.ActivityStreamStorage;
 import com.exoplatform.social.activity.storage.ref.ActivityRefContext;
 import com.exoplatform.social.activity.storage.ref.ActivityRefContext.Builder;
@@ -46,9 +44,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   /** */
   final SOCContext socContext;
   /** */
-  final PersistAlgorithm<ActivityRefKey> refFixedSizeAlgorithm;
-  /** */
-  final PersisterTimerTask timerTask;
+  final PersisterTask timerTask;
   /** */
   final static int persisterThreshold = 500;
   
@@ -59,8 +55,12 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   public MockActivityStreamStorageImpl(int maxPersisterThreshold, SOCContext socContext) {
     this.socContext = socContext;
     this.context = socContext.getVersionContext();
-    this.refFixedSizeAlgorithm = new RefFixedSizeAlgorithm<ActivityRefKey>(this.context, maxPersisterThreshold);
-    timerTask = PersisterTimerTask.init().persister(this).wakeup(INTERVAL_ACTIVITY_PERSIST_THRESHOLD).timeUnit(TimeUnit.MILLISECONDS).build();
+    timerTask = PersisterTask.init()
+                             .persister(this)
+                             .wakeup(INTERVAL_ACTIVITY_PERSIST_THRESHOLD)
+                             .timeUnit(TimeUnit.MILLISECONDS)
+                             .maxFixedSize(maxPersisterThreshold)
+                             .build();
     timerTask.start();
   }
 
@@ -158,7 +158,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   }
 
   private void persistFixedSize(boolean forcePersist) {
-    if (refFixedSizeAlgorithm.shoudldPersist() || forcePersist) {
+    if (timerTask.shoudldPersist(this.context.getChangesSize()) || forcePersist) {
       Set<ActivityRefKey> keys = this.context.popChanges();
       for (ActivityRefKey key : keys) {
         System.out.println("persit:: " + key.toString());
