@@ -48,7 +48,7 @@ public class StreamUpdater {
     if (builder.isUserOwner) {
       versionContext.add(builder.feedKey(), builder.ownerKey());
     } else {
-      versionContext.add(builder.mySpacesKey());
+      versionContext.add(builder.feedKey(), builder.mySpacesKey());
     }
   }
   
@@ -62,7 +62,7 @@ public class StreamUpdater {
     if (builder.isUserOwner) {
       versionContext.remove(builder.feedKey(), builder.ownerKey(), builder.connectionsKey());
     } else {
-      versionContext.remove(builder.mySpacesKey());
+      versionContext.remove(builder.feedKey(), builder.mySpacesKey());
     }
   }
   

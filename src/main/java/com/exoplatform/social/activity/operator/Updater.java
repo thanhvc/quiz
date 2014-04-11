@@ -23,6 +23,7 @@ import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.IdentityProvider;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
+import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey.Builder;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
 import com.exoplatform.social.graph.Vertex;
 import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
@@ -35,10 +36,10 @@ import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
  */
 public class Updater<M extends ExoSocialActivity, G extends SimpleUndirectGraph> extends ActivityOperator<G, M> {
   /** */
-  final OperatorContext addContext;
+  final OperatorContext updateContext;
   
   public Updater(SOCContext socContext) {
-    this.addContext = new OperatorContext.UPDATE(socContext);
+    this.updateContext = new OperatorContext.UPDATE(socContext);
   }
 
   @Override
@@ -48,9 +49,9 @@ public class Updater<M extends ExoSocialActivity, G extends SimpleUndirectGraph>
       //2. Gets the adjacent of activityId vertex
       //3. Gets from caching
       //4. Remove, and put the top
-      ActivityData parentData = addContext.activityCache.get(model.getParentId());
+      ActivityData parentData = updateContext.activityCache.get(model.getParentId());
       if(parentData != null) {
-        updateAllStream(graph, parentData.build());
+        updateStreams(graph, parentData.build());
       }
       
     } else {
@@ -59,7 +60,7 @@ public class Updater<M extends ExoSocialActivity, G extends SimpleUndirectGraph>
       //#2. Gets relationship of poster from relationshipCacheGraph
       //#3. Build Key of AcrivityStream and find in activity caching if it represent in eXo Caching or not
       //#4. If YES, 
-      updateAllStream(graph, model);
+      updateStreams(graph, model);
     }
   }
   
@@ -68,40 +69,49 @@ public class Updater<M extends ExoSocialActivity, G extends SimpleUndirectGraph>
    * @param target
    * @return
    */
-  private boolean updateAllStream(G graph, ExoSocialActivity target) {
-    boolean success = false; 
-    
+  private void updateStreams(G graph, ExoSocialActivity target) {
     boolean isSpaceActivity = target.getPosterProviderId().equalsIgnoreCase(IdentityProvider.SPACE.getName());
-    success |= updateStream(graph, target.getPosterId(), true, isSpaceActivity, target);
-    List<Vertex<Object>> vertices = addContext.relationshipGraph.getAdjacents(target.getPosterId());
+    updateStream(graph, target.getPosterId(), true, isSpaceActivity, target);
+    updateRelationshipStream(graph, target);
+  }
+  
+  private void updateRelationshipStream(G graph, ExoSocialActivity target) {
+    boolean isSpaceActivity = target.getPosterProviderId().equalsIgnoreCase(IdentityProvider.SPACE.getName());
     
+    List<Vertex<Object>> vertices = updateContext.relationshipGraph.getAdjacents(target.getPosterId());
     //add new activity for poster's stream, FEED, CONNECTION, MY SPACES, AND MY ACTIVITY
     for(Vertex<Object> v : vertices) {
-      success |= updateStream(graph, v.unwrap(String.class), false, isSpaceActivity, target);
+      updateStream(graph, v.unwrap(String.class), false, isSpaceActivity, target);
     }
-    
-    
-    return success;
   }
   
   private boolean updateStream(G graph, String identityId, boolean isPoster, boolean isSpaceActivity, ExoSocialActivity target) {
     boolean success = false;
-    ListActivitiesKey key = new ListActivitiesKey(identityId, StreamType.FEED);
-    success |= addContext.update(graph, isPoster, key, target);
+    Builder builder = ListActivitiesKey.init(identityId);
+    
+    //TODO
+    //AStream.UPDATER.in(graph).input(target)
+    //             .feed(builder.key(StreamType.FEED))
+    //             .connection(builder.key(StreamType.CONNECTION))
+    //             .owner(builder.key(StreamType.OWNER)
+    //            .spaces(builder.key(StreamType.MY_SPACES));
+    
+    ListActivitiesKey key = builder.key(StreamType.FEED);
+    success |= updateContext.update(graph, isPoster, key, target);
     //my connection
     if (!isPoster) {
-      key = new ListActivitiesKey(identityId, StreamType.CONNECTION);
-      success |= addContext.update(graph, isPoster, key, target);
+      key = builder.key(StreamType.CONNECTION);
+      success |= updateContext.update(graph, isPoster, key, target);
     }
     
     //my space
     if (isSpaceActivity) {
-      key = new ListActivitiesKey(identityId, StreamType.MY_SPACES);
-      success |= addContext.update(graph, isPoster, key, target);
+      key = builder.key(StreamType.MY_SPACES);
+      success |= updateContext.update(graph, isPoster, key, target);
     }
     
-    key = new ListActivitiesKey(identityId, StreamType.OWNER);
-    success |= addContext.update(graph, isPoster, key, target);
+    key = builder.key(StreamType.OWNER);
+    success |= updateContext.update(graph, isPoster, key, target);
     
     return success;
   }

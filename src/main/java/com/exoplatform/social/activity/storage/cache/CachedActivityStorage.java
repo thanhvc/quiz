@@ -53,7 +53,7 @@ import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
  */
 public class CachedActivityStorage implements ActivityStorage, Persister {
   /** */
-  static final long INTERVAL_ACTIVITY_PERSIST_THRESHOLD = 2000; //2m = 1000 x 2
+  static final long INTERVAL_ACTIVITY_PERSIST_THRESHOLD = 2000; //2s = 1000 x 2
   /** */
   static final String MENTION_CHAR = "@";
   /** */
@@ -61,7 +61,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   /** */
   final DataChangeListener<ExoSocialActivity> cachedListener;
   /** */
-  final DataChangeListener<DataModel> persisterListener;
+  final DataChangeListener<DataModel> jcrPersisterListener;
   /** */
   final GraphListener<ExoSocialActivity> graphListener;
   /** */
@@ -80,7 +80,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     this.socContext = socContext;
     this.context = new  DataContext<DataModel>();
     this.cachedListener = new CachedListener<ExoSocialActivity>(context, socContext);
-    this.persisterListener = new PersisterListener(this.storage, socContext);
+    this.jcrPersisterListener = new PersisterListener(this.storage, socContext);
     this.graphListener = new GraphListener<ExoSocialActivity>(socContext);
     this.activityCache = socContext.getActivityCache();
     this.activitiesCache = socContext.getActivitiesCache();
@@ -103,7 +103,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
       this.socContext.getSession().startSession();
       DataChangeQueue<DataModel> changes = context.popChanges();
       if (changes != null) {
-        changes.broadcast(this.persisterListener);
+        changes.broadcast(this.jcrPersisterListener);
       }
       context.popChanges();
       this.socContext.getSession().stopSession();
@@ -220,7 +220,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   public List<ExoSocialActivity> getFeed(String remoteId, int offset, int limit) {
     List<ExoSocialActivity> got = null;
     
-    ListActivitiesKey key =  new ListActivitiesKey(remoteId, StreamType.FEED);
+    ListActivitiesKey key =  ListActivitiesKey.init(remoteId).key(StreamType.FEED);
     
     if (this.activitiesCache.containsKey(key)) {
       
@@ -296,7 +296,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     
     List<ExoSocialActivity> got = null;
     
-    ListActivitiesKey key =  new ListActivitiesKey(remoteId, StreamType.CONNECTION);
+    ListActivitiesKey key =  ListActivitiesKey.init(remoteId).key(StreamType.CONNECTION);
     
     if (this.activitiesCache.containsKey(key)) {
       
@@ -322,7 +322,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   public List<ExoSocialActivity> getMySpaces(String remoteId, int offset, int limit) {
     List<ExoSocialActivity> got = null;
 
-    ListActivitiesKey key = new ListActivitiesKey(remoteId, StreamType.MY_SPACES);
+    ListActivitiesKey key =  ListActivitiesKey.init(remoteId).key(StreamType.MY_SPACES);
 
     if (this.activitiesCache.containsKey(key)) {
 
@@ -348,7 +348,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   public List<ExoSocialActivity> getSpace(String remoteId, int offset, int limit) {
     List<ExoSocialActivity> got = null;
     
-    ListActivitiesKey key =  new ListActivitiesKey(remoteId, StreamType.SPACE_STREAM);
+    ListActivitiesKey key =  ListActivitiesKey.init(remoteId).key(StreamType.SPACE_STREAM);
     
     if (this.activitiesCache.containsKey(key)) {
       
@@ -374,7 +374,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   public List<ExoSocialActivity> getOwner(String remoteId, int offset, int limit) {
     List<ExoSocialActivity> got = null;
 
-    ListActivitiesKey key = new ListActivitiesKey(remoteId, StreamType.OWNER);
+    ListActivitiesKey key =  ListActivitiesKey.init(remoteId).key(StreamType.OWNER);
 
     if (this.activitiesCache.containsKey(key)) {
 
@@ -495,6 +495,12 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     @Override
     public void onAdd(M target) {
       updater.execute(this.graph, target);
+      //TODO
+      //AStream.UPDATER.in(graph).input(target)
+      //             .feed(builder.key(StreamType.FEED))
+      //             .connection(builder.key(StreamType.CONNECTION))
+      //             .owner(builder.key(StreamType.OWNER)
+      //            .spaces(builder.key(StreamType.MY_SPACES));
     }
 
     @Override

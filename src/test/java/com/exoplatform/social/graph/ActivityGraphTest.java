@@ -30,8 +30,8 @@ public class ActivityGraphTest extends AbstractGraphTest {
 
   
   public void testAddVertex() throws Exception {
-    ListActivitiesKey maryK = new ListActivitiesKey("mary", StreamType.FEED);
-    ListActivitiesKey johnK = new ListActivitiesKey("john", StreamType.FEED);
+    ListActivitiesKey maryK = ListActivitiesKey.init("mary").key(StreamType.FEED);
+    ListActivitiesKey johnK = ListActivitiesKey.init("john").key(StreamType.FEED);
     
     //using ListActivitiesKey as key
     Vertex<Object> maryV = graph.addVertex(maryK);

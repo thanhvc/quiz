@@ -53,8 +53,8 @@ public class PersisterTask implements PersistAlgorithm {
   }
 
   public void start() {
-    scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-    scheduledExecutor.scheduleWithFixedDelay(task, wakeupInterval / 2, wakeupInterval, this.timeUnit);
+    //scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+    //scheduledExecutor.scheduleWithFixedDelay(task, wakeupInterval / 2, wakeupInterval, this.timeUnit);
   }
   
   public void stop() {

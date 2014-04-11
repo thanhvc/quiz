@@ -71,21 +71,28 @@ public class Remover<M extends ExoSocialActivity, G extends SimpleUndirectGraph>
   
   private boolean removeStream(G graph, String identityId, boolean isPoster, boolean isSpaceActivity, ExoSocialActivity target) {
     boolean success = false;
-    ListActivitiesKey key = new ListActivitiesKey(identityId, StreamType.FEED);
+    ListActivitiesKey.Builder builder = ListActivitiesKey.init(identityId);
+    //TODO
+    //AStream.REMOVER.in(graph).input(target)
+    //             .feed(builder.key(StreamType.FEED))
+    //             .connection(builder.key(StreamType.CONNECTION))
+    //             .owner(key).spaces(builder.key(StreamType.OWNER));
+    
+    ListActivitiesKey key = builder.key(StreamType.FEED);
     success |= removeContext.remove(graph, key, target);
     //my connection
     if (!isPoster) {
-      key = new ListActivitiesKey(identityId, StreamType.CONNECTION);
+      key = builder.key(StreamType.CONNECTION);
       success |= removeContext.remove(graph, key, target);
     }
     
     //my space
     if (isSpaceActivity) {
-      key = new ListActivitiesKey(identityId, StreamType.MY_SPACES);
+      key = builder.key(StreamType.MY_SPACES);
       success |= removeContext.remove(graph, key, target);
     }
     
-    key = new ListActivitiesKey(identityId, StreamType.OWNER);
+    key = builder.key(StreamType.OWNER);
     success |= removeContext.remove(graph, key, target);
     
     return success;

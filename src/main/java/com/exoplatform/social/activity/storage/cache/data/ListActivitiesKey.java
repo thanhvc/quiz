@@ -27,13 +27,17 @@ package com.exoplatform.social.activity.storage.cache.data;
 public class ListActivitiesKey {
   
   /**  */
-  private String remoteId;
+  private String identityId;
   
   /** */
   private StreamType type;
   
-  public ListActivitiesKey(String remoteId, StreamType type) {
-    this.remoteId = remoteId;
+  public static Builder init(String identityId) {
+    return new Builder(identityId);
+  }
+  
+  private ListActivitiesKey(Builder builder, StreamType type) {
+    this.identityId = builder.identityId;
     this.type = type;
   }
   
@@ -43,7 +47,18 @@ public class ListActivitiesKey {
    * @return
    */
   public String label() {
-    return remoteId + "_" + this.type.name();
+    return identityId + "_" + this.type.name();
+  }
+  
+  public static class Builder {
+    public final String identityId;
+    public Builder(String identityId) {
+      this.identityId = identityId;
+    }
+
+    public ListActivitiesKey key(StreamType type) {
+      return new ListActivitiesKey(this, type);
+    }
   }
   
   @Override
@@ -57,7 +72,7 @@ public class ListActivitiesKey {
     
     ListActivitiesKey that = (ListActivitiesKey) o;
 
-    if (remoteId != null ? !remoteId.equals(that.remoteId) : that.remoteId != null) {
+    if (identityId != null ? !identityId.equals(that.identityId) : that.identityId != null) {
       return false;
     }
     
@@ -71,14 +86,14 @@ public class ListActivitiesKey {
   @Override
   public int hashCode() {
     int result = 1;
-    result = 31 * result + (remoteId != null ? remoteId.hashCode() : 0);
+    result = 31 * result + (identityId != null ? identityId.hashCode() : 0);
     result = 31 * result + (type != null ? type.hashCode() : 0);
     return result;
   }
   
   @Override
   public String toString() {
-    return "ListActivitiesKey[remoteId: " + this.remoteId + ",type: " + this.type.toString() + " ]";
+    return "ListActivitiesKey[remoteId: " + this.identityId + ",type: " + this.type.toString() + " ]";
   }
 
 }

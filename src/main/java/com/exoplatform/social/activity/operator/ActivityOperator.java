@@ -86,11 +86,9 @@ public abstract class ActivityOperator<G extends SimpleUndirectGraph, M extends 
                          boolean isPoster,
                          ListActivitiesKey key,
                          ExoSocialActivity target) {
-        return processGraph(graph, isPoster, key, target);
-      }
-      
-      private boolean processGraph(SimpleUndirectGraph graph, boolean isPoster, ListActivitiesKey key, ExoSocialActivity target) {
+
         ActivitiesListData data = activitiesCache.get(key);
+        //stream == NULL by StreamKey
         if (!isPoster && data == null)
           return false;
 
@@ -109,7 +107,7 @@ public abstract class ActivityOperator<G extends SimpleUndirectGraph, M extends 
         
         return true;
       }
-
+      
       @Override
       public boolean remove(SimpleUndirectGraph graph, ListActivitiesKey key, ExoSocialActivity target) {
         throw new UnsupportedOperationException("Unsupported to invoke remove() method.");
