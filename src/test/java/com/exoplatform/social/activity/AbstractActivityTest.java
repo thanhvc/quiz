@@ -28,6 +28,7 @@ import com.exoplatform.social.activity.mock.MockActivityStreamStorageImpl;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.cache.CachedActivityStorage;
 import com.exoplatform.social.activity.storage.cache.data.IdentityProvider;
+import com.exoplatform.social.activity.storage.stream.StreamUpdater;
 import com.exoplatform.utils.LogWatch;
 
 /**
@@ -72,6 +73,7 @@ public abstract class AbstractActivityTest extends TestCase {
   @Override
   protected void tearDown() throws Exception {
     super.tearDown();
+    socContext.clear();
     socContext = null;
     this.cachedActivityStorage = null;
     activityStorage = null;

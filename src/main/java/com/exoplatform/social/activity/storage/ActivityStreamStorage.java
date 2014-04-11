@@ -41,6 +41,7 @@ public interface ActivityStreamStorage {
   
   void update(ExoSocialActivity activity, String[] mentioner);
   
+  @Deprecated
   void updateCommenter(ExoSocialActivity activity);
   
 }

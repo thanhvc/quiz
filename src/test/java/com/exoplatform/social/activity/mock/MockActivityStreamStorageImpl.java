@@ -20,14 +20,14 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.exoplatform.social.SOCContext;
-import com.exoplatform.social.activity.VersionChangeContext;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.persister.Persister;
 import com.exoplatform.social.activity.persister.PersisterTask;
 import com.exoplatform.social.activity.storage.ActivityStreamStorage;
-import com.exoplatform.social.activity.storage.ref.ActivityRefContext;
-import com.exoplatform.social.activity.storage.ref.ActivityRefContext.Builder;
-import com.exoplatform.social.activity.storage.ref.ActivityRefKey;
+import com.exoplatform.social.activity.storage.stream.ActivityRefContext;
+import com.exoplatform.social.activity.storage.stream.ActivityRefContext.Builder;
+import com.exoplatform.social.activity.storage.stream.ActivityRefKey;
+import com.exoplatform.social.activity.storage.stream.StreamUpdater;
 
 /**
  * Created by The eXo Platform SAS
@@ -40,9 +40,9 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   /** */
   static final long INTERVAL_ACTIVITY_PERSIST_THRESHOLD = 5000; //5m = 1000 x 5
   /** */
-  final VersionChangeContext<ActivityRefKey> context;
-  /** */
   final SOCContext socContext;
+  /** */
+  final StreamUpdater streamUpdater;
   /** */
   final PersisterTask timerTask;
   /** */
@@ -54,7 +54,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   
   public MockActivityStreamStorageImpl(int maxPersisterThreshold, SOCContext socContext) {
     this.socContext = socContext;
-    this.context = socContext.getVersionContext();
+    this.streamUpdater = socContext.getStreamUpdater();
     timerTask = PersisterTask.init()
                              .persister(this)
                              .wakeup(INTERVAL_ACTIVITY_PERSIST_THRESHOLD)
@@ -67,11 +67,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   @Override
   public void savePoster(ExoSocialActivity activity) {
     Builder builder = ActivityRefContext.initActivity(activity);
-    if (builder.isUserOwner) {
-      context.add(builder.feedKey(), builder.ownerKey());
-    } else {
-      context.add(builder.mySpacesKey());
-    }
+    streamUpdater.owner(builder);
     commit(false);
   }
 
@@ -82,11 +78,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
     if (commenters != null) {
       for(String commenterId : commenters) {
         Builder builder = ActivityRefContext.initActivity(commenterId, activity);
-        if (builder.isUserOwner) {
-          context.add(builder.feedKey(), builder.ownerKey());
-        } else {
-          context.add(builder.mySpacesKey());
-        }
+        streamUpdater.owner(builder);
       }
     }
     
@@ -97,12 +89,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   public void delete(String activityId) {
     ExoSocialActivity activity = socContext.getActivityCache().get(activityId).build();
     Builder builder = ActivityRefContext.initActivity(activity);
-    
-    if (builder.isUserOwner) {
-      context.remove(builder.feedKey(), builder.ownerKey(), builder.connectionsKey());
-    } else {
-      context.remove(builder.mySpacesKey());
-    }
+    streamUpdater.remove(builder);
   }
 
   @Override
@@ -131,17 +118,13 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
     if (commenters != null) {
       for(String commenterId : commenters) {
         Builder builder = ActivityRefContext.initActivity(commenterId, activity);
-        if (builder.isUserOwner) {
-          context.add(builder.feedKey(), builder.ownerKey());
-        } else {
-          context.add(builder.mySpacesKey());
-        }
+        streamUpdater.owner(builder);
       }
     }
     
     //TODO
     //gets activity reference and update
-    
+    //after we can remove the update
     commit(false);
   }
   
@@ -151,8 +134,8 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   }
 
   private void persistFixedSize(boolean forcePersist) {
-    if (timerTask.shoudldPersist(this.context.getChangesSize()) || forcePersist) {
-      Set<ActivityRefKey> keys = this.context.popChanges();
+    if (timerTask.shoudldPersist(streamUpdater.getChangesSize()) || forcePersist) {
+      Set<ActivityRefKey> keys = streamUpdater.popChanges();
       for (ActivityRefKey key : keys) {
         System.out.println("persit:: " + key.toString());
       }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.activity.storage.ref;
+package com.exoplatform.social.activity.storage.stream;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,9 @@ import java.util.List;
 import com.exoplatform.social.activity.AbstractActivityTest;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
-import com.exoplatform.social.activity.storage.ref.ActivityRefContext.PostType;
+import com.exoplatform.social.activity.storage.stream.ActivityRefContext;
+import com.exoplatform.social.activity.storage.stream.ActivityRefKey;
+import com.exoplatform.social.activity.storage.stream.ActivityRefContext.PostType;
 
 
 /**

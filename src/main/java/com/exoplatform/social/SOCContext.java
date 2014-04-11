@@ -19,12 +19,11 @@ package com.exoplatform.social;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.exoplatform.social.activity.VersionChangeContext;
 import com.exoplatform.social.activity.storage.SOCSession;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
-import com.exoplatform.social.activity.storage.ref.ActivityRefKey;
+import com.exoplatform.social.activity.storage.stream.StreamUpdater;
 import com.exoplatform.social.graph.Vertex;
 import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
@@ -38,13 +37,14 @@ public class SOCContext {
   /** */
   final SOCSession session;
   /** */
+  final StreamUpdater streamUpdater;
+  /** */
   final Map<String, ActivityData> activityCache;
   
   /** */
   final Map<ListActivitiesKey, ActivitiesListData> activitiesCache;
   
-  /** */
-  final VersionChangeContext<ActivityRefKey> versionContext;
+  
   
   /** */
   final SimpleUndirectGraph activityCacheGraph;
@@ -55,7 +55,7 @@ public class SOCContext {
   @SuppressWarnings("unchecked")
   public SOCContext() {
     this.session = new SOCSession();
-    this.versionContext = new VersionChangeContext<ActivityRefKey>();
+    this.streamUpdater = new StreamUpdater();
     this.activityCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
     this.relationshipCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
     this.activityCache = new HashMap<String, ActivityData>();
@@ -92,16 +92,16 @@ public class SOCContext {
     return activitiesCache;
   }
   
+  public StreamUpdater getStreamUpdater() {
+    return streamUpdater;
+  }
+  
   public void clear() {
     this.activitiesCache.clear();
     this.activityCache.clear();
     this.activityCacheGraph.clear();
     this.relationshipCacheGraph.clear();
-    this.versionContext.clearChanges();
-  }
-  
-  public VersionChangeContext<ActivityRefKey> getVersionContext() {
-    return versionContext;
+    streamUpdater.clearAll();
   }
   
   public class ActivityTask implements Runnable {

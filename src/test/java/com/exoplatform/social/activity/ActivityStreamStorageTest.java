@@ -49,7 +49,7 @@ public class ActivityStreamStorageTest extends AbstractActivityTest {
     assertEquals(data.getStatus(), DataStatus.TRANSIENT);
     
     //don't enough number of activity to active Activity Persister
-    assertEquals(0, this.socContext.getVersionContext().getChangesSize());
+    assertEquals(0, this.socContext.getStreamUpdater().getChangesSize());
   }
   
   public void testGetFeed() throws Exception {
@@ -63,7 +63,7 @@ public class ActivityStreamStorageTest extends AbstractActivityTest {
     feed = cachedActivityStorage.getFeed("mary", 0, 20);
     assertEquals(20, feed.size());
     
-    assertEquals(numberOfRefKeys(50), this.socContext.getVersionContext().getChangesSize());
+    assertEquals(numberOfRefKeys(50), this.socContext.getStreamUpdater().getChangesSize());
   }
   
   public void testGetMySpaces() throws Exception {
@@ -77,7 +77,7 @@ public class ActivityStreamStorageTest extends AbstractActivityTest {
     myspaces = cachedActivityStorage.getMySpaces("john", 0, 20);
     assertEquals(20, myspaces.size());
     
-    assertEquals(numberOfRefKeys(60), this.socContext.getVersionContext().getChangesSize());
+    assertEquals(numberOfRefKeys(60), this.socContext.getStreamUpdater().getChangesSize());
   }
   
   public void testGetOwner() throws Exception {
@@ -91,11 +91,13 @@ public class ActivityStreamStorageTest extends AbstractActivityTest {
     owner = cachedActivityStorage.getOwner("demo", 0, 20);
     assertEquals(20, owner.size());
     
-    assertEquals(numberOfRefKeys(80), this.socContext.getVersionContext().getChangesSize());
+    assertEquals(numberOfRefKeys(80), this.socContext.getStreamUpdater().getChangesSize());
   }
   
   public void testGetConnections() throws Exception {
 
+    assertEquals(0, this.socContext.getStreamUpdater().getChangesSize());
+    
     listOf(70, "bob", false, true);
 
     List<ExoSocialActivity> connections = cachedActivityStorage.getConnections("bob", 0, 20);
@@ -105,7 +107,7 @@ public class ActivityStreamStorageTest extends AbstractActivityTest {
     connections = cachedActivityStorage.getConnections("bob", 0, 20);
     assertEquals(20, connections.size());
     
-    assertEquals(numberOfRefKeys(70), this.socContext.getVersionContext().getChangesSize());
+    assertEquals(numberOfRefKeys(70), this.socContext.getStreamUpdater().getChangesSize());
   }
   
   public void testSaveActivities10() throws Exception {
@@ -117,7 +119,7 @@ public class ActivityStreamStorageTest extends AbstractActivityTest {
     assertNotNull(data0);
     assertEquals(data0.getStatus(), DataStatus.TRANSIENT);
     
-    assertEquals(numberOfRefKeys(10), this.socContext.getVersionContext().getChangesSize());
+    assertEquals(numberOfRefKeys(10), this.socContext.getStreamUpdater().getChangesSize());
   }
   
   public void testSaveActivities15() throws Exception {
@@ -142,13 +144,13 @@ public class ActivityStreamStorageTest extends AbstractActivityTest {
     assertNotNull(data14);
     assertEquals(data14.getStatus(), DataStatus.TRANSIENT);
     
-    assertEquals(numberOfRefKeys(15), this.socContext.getVersionContext().getChangesSize());
+    assertEquals(numberOfRefKeys(15), this.socContext.getStreamUpdater().getChangesSize());
     
   }
   
   public void testUpdateActivities10() throws Exception {
     
-    assertEquals(0, this.socContext.getVersionContext().getChangesSize());
+    assertEquals(0, this.socContext.getStreamUpdater().getChangesSize());
     
     List<ExoSocialActivity> list = listOf(10, "mary", false, true);
     
@@ -168,7 +170,7 @@ public class ActivityStreamStorageTest extends AbstractActivityTest {
     assertEquals("updated by mary", data0.getTitle());
     
     int numberOfUpdate = 4; //(2 updated x 2 refs)
-    assertEquals(numberOfRefKeys(14) - numberOfUpdate, this.socContext.getVersionContext().getChangesSize());
+    assertEquals(numberOfRefKeys(14) - numberOfUpdate, this.socContext.getStreamUpdater().getChangesSize());
     
   }
   

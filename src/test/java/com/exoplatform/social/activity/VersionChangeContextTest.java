@@ -19,9 +19,9 @@ package com.exoplatform.social.activity;
 import java.util.List;
 
 import com.exoplatform.social.activity.model.ExoSocialActivity;
-import com.exoplatform.social.activity.storage.ref.ActivityRefContext;
-import com.exoplatform.social.activity.storage.ref.ActivityRefContext.Builder;
-import com.exoplatform.social.activity.storage.ref.ActivityRefKey;
+import com.exoplatform.social.activity.storage.stream.ActivityRefContext;
+import com.exoplatform.social.activity.storage.stream.ActivityRefKey;
+import com.exoplatform.social.activity.storage.stream.ActivityRefContext.Builder;
 
 /**
  * Created by The eXo Platform SAS
@@ -36,7 +36,7 @@ public class VersionChangeContextTest extends AbstractActivityTest {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    versionContext = this.socContext.getVersionContext();
+    versionContext = new VersionChangeContext<ActivityRefKey>();
   }
   
   @Override
