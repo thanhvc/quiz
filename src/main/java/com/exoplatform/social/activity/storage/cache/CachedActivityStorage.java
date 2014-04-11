@@ -33,8 +33,6 @@ import com.exoplatform.social.activity.operator.Updater;
 import com.exoplatform.social.activity.persister.Persister;
 import com.exoplatform.social.activity.persister.PersisterTask;
 import com.exoplatform.social.activity.storage.ActivityStorage;
-import com.exoplatform.social.activity.storage.ActivityStreamStorage;
-import com.exoplatform.social.activity.storage.SOCSession;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.DataModel;
@@ -69,11 +67,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   /** */
   final PersisterTask timerTask;
   /** */
-  final ActivityStreamStorage streamStorage;
-  /** */
   final ActivityStorage storage;
-  /** */
-  final SOCSession session;
   /** */
   final SOCContext socContext;
   /** */
@@ -83,12 +77,10 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   
   public CachedActivityStorage(int persisterThreshold, SOCContext socContext, ActivityStorage storage) {
     this.storage = storage;
-    this.streamStorage = new CachedActivityStreamStorage();
-    this.session = new SOCSession();
     this.socContext = socContext;
     this.context = new  DataContext<DataModel>();
     this.cachedListener = new CachedListener<ExoSocialActivity>(context, socContext);
-    this.persisterListener = new PersisterListener(this.storage, this.session, socContext);
+    this.persisterListener = new PersisterListener(this.storage, socContext);
     this.graphListener = new GraphListener<ExoSocialActivity>(socContext);
     this.activityCache = socContext.getActivityCache();
     this.activitiesCache = socContext.getActivitiesCache();
@@ -108,14 +100,13 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   
   private void persistFixedSize(boolean forcePersist) {
     if (timerTask.shoudldPersist(context.getChangesSize()) || forcePersist) {
-      session.startSession();
+      this.socContext.getSession().startSession();
       DataChangeQueue<DataModel> changes = context.popChanges();
       if (changes != null) {
         changes.broadcast(this.persisterListener);
       }
-      
       context.popChanges();
-      session.stopSession();
+      this.socContext.getSession().stopSession();
     }
   }
 

@@ -78,6 +78,17 @@ public final class VersionChangeContext<T extends Version> {
   public void add(T target) {
     addChange(target);
   }
+  
+  /**
+   * Adds the models
+   * @param target
+   */
+  public void add(T...targets) { 
+    for(int i = 0, len = targets.length; i< len; i++) {
+      addChange(targets[i]);
+    }
+    
+  }
 
   /**
    * Removes the model
@@ -85,6 +96,15 @@ public final class VersionChangeContext<T extends Version> {
    */
   public void remove(T target) {
     removeChange(target);
+  }
+  /**
+   * Removes the models
+   * @param target
+   */
+  public void remove(T...targets) {
+    for(int i = 0, len = targets.length; i< len; i++) {
+      removeChange(targets[i]);
+    }
   }
   
   /**

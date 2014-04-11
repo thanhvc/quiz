@@ -16,14 +16,11 @@
  */
 package com.exoplatform.social;
 
-import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
 
 import com.exoplatform.social.activity.VersionChangeContext;
-import com.exoplatform.social.activity.persister.Persister;
+import com.exoplatform.social.activity.storage.SOCSession;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
@@ -39,6 +36,8 @@ import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
  */
 public class SOCContext {
   /** */
+  final SOCSession session;
+  /** */
   final Map<String, ActivityData> activityCache;
   
   /** */
@@ -53,13 +52,9 @@ public class SOCContext {
   /** */
   final SimpleUndirectGraph relationshipCacheGraph;
   
-  /** */
-  private static ConcurrentHashMap<Object, SoftReference<Persister>> persisters;
-  /** */
-  private static ScheduledExecutorService scheduledExecutor;
-  
   @SuppressWarnings("unchecked")
   public SOCContext() {
+    this.session = new SOCSession();
     this.versionContext = new VersionChangeContext<ActivityRefKey>();
     this.activityCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
     this.relationshipCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
@@ -116,6 +111,9 @@ public class SOCContext {
       }
     }
   }
-  
+
+  public SOCSession getSession() {
+    return session;
+  }
 
 }

@@ -23,7 +23,6 @@ import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.ActivityStorage;
-import com.exoplatform.social.activity.storage.SOCSession;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.DataModel;
@@ -120,8 +119,6 @@ public class ActivityStorageImpl implements ActivityStorage {
   
   public static class PersisterListener implements DataChangeListener<DataModel> {
     /** */
-    final SOCSession session;
-    /** */
     final ActivityStorage storage;
     /** */
     final Map<String, ActivityData> activityCache;
@@ -131,9 +128,7 @@ public class ActivityStorageImpl implements ActivityStorage {
     final SOCContext socContext;
     
     public PersisterListener(ActivityStorage storage,
-                             SOCSession session,
                              SOCContext socContext) {
-      this.session = session;
       this.storage = storage;
       this.activityCache = socContext.getActivityCache();
       this.activitiesCache = socContext.getActivitiesCache();

@@ -26,6 +26,7 @@ import com.exoplatform.social.activity.model.ExoSocialActivity;
  */
 public interface ActivityStreamStorage {
 
+  @Deprecated
   void savePoster(ExoSocialActivity activity);
   
   void save(ExoSocialActivity activity);

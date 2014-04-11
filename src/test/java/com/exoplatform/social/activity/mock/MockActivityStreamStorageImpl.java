@@ -67,14 +67,11 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   @Override
   public void savePoster(ExoSocialActivity activity) {
     Builder builder = ActivityRefContext.initActivity(activity);
-    
     if (builder.isUserOwner) {
-      context.add(builder.feedKey());
-      context.add(builder.ownerKey());
+      context.add(builder.feedKey(), builder.ownerKey());
     } else {
       context.add(builder.mySpacesKey());
     }
-    
     commit(false);
   }
 
@@ -86,8 +83,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
       for(String commenterId : commenters) {
         Builder builder = ActivityRefContext.initActivity(commenterId, activity);
         if (builder.isUserOwner) {
-          context.add(builder.feedKey());
-          context.add(builder.ownerKey());
+          context.add(builder.feedKey(), builder.ownerKey());
         } else {
           context.add(builder.mySpacesKey());
         }
@@ -103,9 +99,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
     Builder builder = ActivityRefContext.initActivity(activity);
     
     if (builder.isUserOwner) {
-      context.remove(builder.feedKey());
-      context.remove(builder.ownerKey());
-      context.remove(builder.connectionsKey());
+      context.remove(builder.feedKey(), builder.ownerKey(), builder.connectionsKey());
     } else {
       context.remove(builder.mySpacesKey());
     }
@@ -138,8 +132,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
       for(String commenterId : commenters) {
         Builder builder = ActivityRefContext.initActivity(commenterId, activity);
         if (builder.isUserOwner) {
-          context.add(builder.feedKey());
-          context.add(builder.ownerKey());
+          context.add(builder.feedKey(), builder.ownerKey());
         } else {
           context.add(builder.mySpacesKey());
         }
