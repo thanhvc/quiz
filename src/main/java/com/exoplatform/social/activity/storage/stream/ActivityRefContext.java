@@ -17,8 +17,7 @@
 package com.exoplatform.social.activity.storage.stream;
 
 import com.exoplatform.social.activity.model.ExoSocialActivity;
-import com.exoplatform.social.activity.storage.cache.data.IdentityProvider;
-import com.exoplatform.social.activity.storage.cache.data.StreamType;
+import com.exoplatform.social.activity.storage.stream.AStream.Builder;
 
 /**
  * Created by The eXo Platform SAS
@@ -39,21 +38,6 @@ public class ActivityRefContext {
   final ExoSocialActivity comment;
   final PostType type;
   
-  public static Builder initActivity(ExoSocialActivity activity) {
-    return new Builder(activity);
-  }
-  
-  public static Builder initActivity(String identityId, ExoSocialActivity activity) {
-    return new Builder(identityId, activity);
-  }
-  
-  public static Builder initComment(ExoSocialActivity activity, ExoSocialActivity comment) {
-    return new Builder(activity, comment);
-  }
-  
-  public static Builder initComment(String identityId, ExoSocialActivity activity, ExoSocialActivity comment) {
-    return new Builder(identityId, activity, comment);
-  }
   
   public ActivityRefContext(Builder builder) {
     this.isUserOwner = builder.isUserOwner;
@@ -62,71 +46,4 @@ public class ActivityRefContext {
     this.comment = builder.comment;
     this.type = builder.type;
   }
-  
-  public static class Builder {
-    public boolean isUserOwner;
-    public String identityId;
-    public ExoSocialActivity activity;
-    public ExoSocialActivity comment;
-    public PostType type;
-    
-    public Builder(ExoSocialActivity activity, ExoSocialActivity comment) {
-     this(activity.getPosterId(), activity, comment);
-    }
-    
-    public Builder(String identityId, ExoSocialActivity activity, ExoSocialActivity comment) {
-      this.isUserOwner = IdentityProvider.USER.name().equalsIgnoreCase(activity.getPosterProviderId());
-      this.type = comment != null ? PostType.COMMENT : PostType.ACTIVITY;
-      this.activity = activity;
-      this.comment = comment;
-      this.identityId = identityId;
-      
-    }
-    
-    public Builder(ExoSocialActivity activity) {
-      this(activity, null);
-    }
-    
-    public Builder(String identityId, ExoSocialActivity activity) {
-      this(identityId, activity, null);
-    }
-    
-    public ActivityRefContext build() {
-      return new ActivityRefContext(this);
-    }
-    
-    /**
-     * Build the feed stream key and context
-     * @return
-     */
-    public ActivityRefKey feedKey() {
-      return new ActivityRefKey(this, StreamType.FEED);
-    }
-    
-    /**
-     * Build the connection stream key and context
-     * @return
-     */
-    public ActivityRefKey connectionsKey() {
-      return this.isUserOwner ? new ActivityRefKey(this, StreamType.CONNECTION) : null;
-    }
-    
-    /**
-     * Build the owner stream key and context
-     * @return
-     */
-    public ActivityRefKey ownerKey() {
-      return this.isUserOwner ? new ActivityRefKey(this, StreamType.OWNER) : null;
-    }
-    
-    
-    /**
-     * Build the my spaces stream key and context
-     * @return
-     */
-    public ActivityRefKey mySpacesKey() {
-      return this.isUserOwner ? new ActivityRefKey(this, StreamType.MY_SPACES) : null;
-    }
-  }
-
 }

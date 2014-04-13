@@ -18,7 +18,7 @@ package com.exoplatform.social.activity.storage.stream;
 
 import com.exoplatform.social.activity.Version;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
-import com.exoplatform.social.activity.storage.stream.ActivityRefContext.Builder;
+import com.exoplatform.social.activity.storage.stream.AStream.Builder;
 
 /**
  * Created by The eXo Platform SAS

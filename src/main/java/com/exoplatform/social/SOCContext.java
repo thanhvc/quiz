@@ -25,7 +25,7 @@ import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.DataModel;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
-import com.exoplatform.social.activity.storage.stream.StreamUpdater;
+import com.exoplatform.social.activity.storage.stream.AStreamVersion;
 import com.exoplatform.social.graph.Vertex;
 import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
@@ -40,7 +40,7 @@ public class SOCContext {
   /** */
   final SOCSession session;
   /** */
-  final StreamUpdater streamUpdater;
+  final AStreamVersion streamUpdater;
   /** */
   final Map<String, ActivityData> activityCache;
   
@@ -60,7 +60,7 @@ public class SOCContext {
   public SOCContext() {
     this.session = new SOCSession();
     this.context = new DataContext<DataModel>();
-    this.streamUpdater = new StreamUpdater();
+    this.streamUpdater = new AStreamVersion();
     this.activityCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
     this.relationshipCacheGraph = new SimpleUndirectGraph(Vertex.MODEL);
     this.activityCache = new HashMap<String, ActivityData>();
@@ -97,7 +97,7 @@ public class SOCContext {
     return activitiesCache;
   }
   
-  public StreamUpdater getStreamUpdater() {
+  public AStreamVersion getStreamUpdater() {
     return streamUpdater;
   }
   

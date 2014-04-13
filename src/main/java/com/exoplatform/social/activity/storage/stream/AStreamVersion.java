@@ -19,7 +19,7 @@ package com.exoplatform.social.activity.storage.stream;
 import java.util.Set;
 
 import com.exoplatform.social.activity.VersionChangeContext;
-import com.exoplatform.social.activity.storage.stream.ActivityRefContext.Builder;
+import com.exoplatform.social.activity.storage.stream.AStream.Builder;
 
 /**
  * Created by The eXo Platform SAS
@@ -27,12 +27,12 @@ import com.exoplatform.social.activity.storage.stream.ActivityRefContext.Builder
  *          exo@exoplatform.com
  * Apr 11, 2014  
  */
-public class StreamUpdater {
+public class AStreamVersion {
 
   /** */
   private final VersionChangeContext<ActivityRefKey> versionContext;
   
-  public StreamUpdater() {
+  public AStreamVersion() {
     versionContext = new VersionChangeContext<ActivityRefKey>();
   }
   

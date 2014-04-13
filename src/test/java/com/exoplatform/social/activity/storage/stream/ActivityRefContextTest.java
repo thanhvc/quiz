@@ -40,7 +40,7 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefContext> keys = new ArrayList<ActivityRefContext>(made.size());
     
     for(ExoSocialActivity a : made) {
-      keys.add(ActivityRefContext.initActivity(a).build());
+      keys.add(AStream.initActivity(a).buildContext());
     }
     
     assertEquals(5, keys.size());
@@ -59,7 +59,7 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefContext> keys = new ArrayList<ActivityRefContext>(comments.size());
     
     for(ExoSocialActivity comment : comments) {
-      keys.add(ActivityRefContext.initComment(activity.get(0), comment).build());
+      keys.add(AStream.initComment(activity.get(0), comment).buildContext());
     }
     
     assertEquals(5, keys.size());
@@ -76,7 +76,7 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefKey> keys = new ArrayList<ActivityRefKey>(made.size());
     
     for(ExoSocialActivity a : made) {
-      keys.add(ActivityRefContext.initActivity(a).feedKey());
+      keys.add(AStream.initActivity(a).feedKey());
     }
     
     for(ActivityRefKey key : keys) {
@@ -91,7 +91,7 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefKey> keys = new ArrayList<ActivityRefKey>(made.size());
     
     for(ExoSocialActivity a : made) {
-      keys.add(ActivityRefContext.initActivity(a).connectionsKey());
+      keys.add(AStream.initActivity(a).connectionsKey());
     }
     
     for(ActivityRefKey key : keys) {
@@ -106,7 +106,7 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefKey> keys = new ArrayList<ActivityRefKey>(made.size());
     
     for(ExoSocialActivity a : made) {
-      keys.add(ActivityRefContext.initActivity(a).mySpacesKey());
+      keys.add(AStream.initActivity(a).mySpacesKey());
     }
     
     for(ActivityRefKey key : keys) {
@@ -121,7 +121,7 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefKey> keys = new ArrayList<ActivityRefKey>(made.size());
     
     for(ExoSocialActivity a : made) {
-      keys.add(ActivityRefContext.initActivity(a).ownerKey());
+      keys.add(AStream.initActivity(a).ownerKey());
     }
     
     for(ActivityRefKey key : keys) {

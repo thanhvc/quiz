@@ -19,9 +19,10 @@ package com.exoplatform.social.activity;
 import java.util.List;
 
 import com.exoplatform.social.activity.model.ExoSocialActivity;
+import com.exoplatform.social.activity.storage.stream.AStream;
+import com.exoplatform.social.activity.storage.stream.AStream.Builder;
 import com.exoplatform.social.activity.storage.stream.ActivityRefContext;
 import com.exoplatform.social.activity.storage.stream.ActivityRefKey;
-import com.exoplatform.social.activity.storage.stream.ActivityRefContext.Builder;
 
 /**
  * Created by The eXo Platform SAS
@@ -49,7 +50,7 @@ public class VersionChangeContextTest extends AbstractActivityTest {
     List<ExoSocialActivity> made =  listOf(5, "mary", false, false);
 
     for(ExoSocialActivity a : made) {
-      Builder builder = ActivityRefContext.initActivity(a);
+      Builder builder = AStream.initActivity(a);
       versionContext.add(builder.feedKey());
       versionContext.add(builder.ownerKey());
     }
@@ -61,7 +62,7 @@ public class VersionChangeContextTest extends AbstractActivityTest {
     List<ExoSocialActivity> made =  listOf(5, "mary", false, false);
 
     for(ExoSocialActivity a : made) {
-      Builder builder = ActivityRefContext.initActivity(a);
+      Builder builder = AStream.initActivity(a);
       versionContext.add(builder.feedKey());
       versionContext.add(builder.ownerKey());
     }
@@ -71,7 +72,7 @@ public class VersionChangeContextTest extends AbstractActivityTest {
     Long increaseLastUpdated = System.currentTimeMillis() + 5000;
     a3.setLastUpdated(increaseLastUpdated);
     
-    Builder builder = ActivityRefContext.initActivity(a3);
+    Builder builder = AStream.initActivity(a3);
     versionContext.add(builder.feedKey());
     versionContext.add(builder.ownerKey());
     
@@ -87,7 +88,7 @@ public class VersionChangeContextTest extends AbstractActivityTest {
     List<ExoSocialActivity> made =  listOf(5, "mary", false, false);
 
     for(ExoSocialActivity a : made) {
-      Builder builder = ActivityRefContext.initActivity(a);
+      Builder builder = AStream.initActivity(a);
       versionContext.add(builder.feedKey());
       versionContext.add(builder.ownerKey());
     }
@@ -97,7 +98,7 @@ public class VersionChangeContextTest extends AbstractActivityTest {
     Long decreaseLastUpdated = a1.getLastUpdated() - 5000;
     a1.setLastUpdated(decreaseLastUpdated);
     
-    Builder builder = ActivityRefContext.initActivity(a1);
+    Builder builder = AStream.initActivity(a1);
     versionContext.add(builder.feedKey());
     versionContext.add(builder.ownerKey());
     

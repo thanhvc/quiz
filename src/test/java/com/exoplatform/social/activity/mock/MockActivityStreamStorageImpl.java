@@ -24,10 +24,10 @@ import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.persister.Persister;
 import com.exoplatform.social.activity.persister.PersisterTask;
 import com.exoplatform.social.activity.storage.ActivityStreamStorage;
-import com.exoplatform.social.activity.storage.stream.ActivityRefContext;
-import com.exoplatform.social.activity.storage.stream.ActivityRefContext.Builder;
+import com.exoplatform.social.activity.storage.stream.AStream;
+import com.exoplatform.social.activity.storage.stream.AStream.Builder;
+import com.exoplatform.social.activity.storage.stream.AStreamVersion;
 import com.exoplatform.social.activity.storage.stream.ActivityRefKey;
-import com.exoplatform.social.activity.storage.stream.StreamUpdater;
 
 /**
  * Created by The eXo Platform SAS
@@ -42,7 +42,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   /** */
   final SOCContext socContext;
   /** */
-  final StreamUpdater streamUpdater;
+  final AStreamVersion streamUpdater;
   /** */
   final PersisterTask timerTask;
   /** */
@@ -66,7 +66,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
 
   @Override
   public void savePoster(ExoSocialActivity activity) {
-    Builder builder = ActivityRefContext.initActivity(activity);
+    Builder builder = AStream.initActivity(activity);
     streamUpdater.owner(builder);
     commit(false);
   }
@@ -77,7 +77,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
     
     if (commenters != null) {
       for(String commenterId : commenters) {
-        Builder builder = ActivityRefContext.initActivity(commenterId, activity);
+        Builder builder = AStream.initActivity(commenterId, activity);
         streamUpdater.owner(builder);
       }
     }
@@ -88,7 +88,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
   @Override
   public void delete(String activityId) {
     ExoSocialActivity activity = socContext.getActivityCache().get(activityId).build();
-    Builder builder = ActivityRefContext.initActivity(activity);
+    Builder builder = AStream.initActivity(activity);
     streamUpdater.remove(builder);
   }
 
@@ -117,7 +117,7 @@ public class MockActivityStreamStorageImpl implements ActivityStreamStorage, Per
     String[] commenters = activity.getCommenters();
     if (commenters != null) {
       for(String commenterId : commenters) {
-        Builder builder = ActivityRefContext.initActivity(commenterId, activity);
+        Builder builder = AStream.initActivity(commenterId, activity);
         streamUpdater.owner(builder);
       }
     }
