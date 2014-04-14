@@ -17,6 +17,7 @@
 package com.exoplatform.social.activity.storage.stream;
 
 import com.exoplatform.social.activity.Version;
+import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
 import com.exoplatform.social.activity.storage.stream.AStream.Builder;
 
@@ -36,6 +37,10 @@ public final class ActivityRefKey extends Version {
     this.identityId = builder.identityId;
     this.type = type;
     this.activityId = builder.activity.getId();
+  }
+  
+  public ListActivitiesKey listActivitiesKey() {
+    return ListActivitiesKey.init(this.identityId).key(this.type);
   }
   
   @Override

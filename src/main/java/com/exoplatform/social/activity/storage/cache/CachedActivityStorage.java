@@ -27,9 +27,9 @@ import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.DataChangeQueue;
 import com.exoplatform.social.activity.DataContext;
+import com.exoplatform.social.activity.listener.CachedListener;
+import com.exoplatform.social.activity.listener.GraphListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
-import com.exoplatform.social.activity.operator.Remover;
-import com.exoplatform.social.activity.operator.Updater;
 import com.exoplatform.social.activity.persister.Persister;
 import com.exoplatform.social.activity.persister.PersisterTask;
 import com.exoplatform.social.activity.storage.ActivityStorage;
@@ -38,12 +38,8 @@ import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.DataModel;
 import com.exoplatform.social.activity.storage.cache.data.DataStatus;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
-import com.exoplatform.social.activity.storage.cache.data.StreamFixedSizeListener;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
 import com.exoplatform.social.activity.storage.impl.ActivityStorageImpl.PersisterListener;
-import com.exoplatform.social.graph.Operator;
-import com.exoplatform.social.graph.Vertex;
-import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
 /**
  * Created by The eXo Platform SAS
@@ -419,109 +415,5 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   @Override
   public int getNumberOfOwner(String remoteId) {
     return this.storage.getNumberOfOwner(remoteId);
-  }
-  
-  
-  static class CachedListener<M extends ExoSocialActivity> implements DataChangeListener<M> {
-    
-    final DataContext<DataModel> context;
-    /** */
-    final Map<String, ActivityData> activityCache;
-    /** */
-    final Map<ListActivitiesKey, ActivitiesListData> activitiesCache;
-    /** */
-    final SOCContext socContext;
-    
-    public CachedListener(DataContext<DataModel> context, SOCContext socContext) {
-      this.context = context;
-      this.activityCache = socContext.getActivityCache();
-      this.activitiesCache = socContext.getActivitiesCache();
-      this.socContext = socContext;
-    }
-
-    @Override
-    public void onAdd(ExoSocialActivity target) {
-      ActivityData data = new ActivityData(target, DataStatus.TRANSIENT);
-      activityCache.put(data.getId(), data);
-      
-      //
-      context.add(data.buildModel());
-    }
-
-    @Override
-    public void onRemove(ExoSocialActivity target) {
-      ActivityData data = activityCache.get(target.getId());
-      if (data != null && data.getStatus().equals(DataStatus.REMOVED)) {
-        return;
-      }
-      
-      data.setStatus(DataStatus.REMOVED);
-      // activityCache.put(data.getId(), data);
-      // TODO find all of activity's comments, and update DataStatus.REMOVED
-      context.remove(data.buildModel());
-    }
-
-    @Override
-    public void onUpdate(ExoSocialActivity target) {
-      ActivityData data = activityCache.get(target.getId());
-      if (data != null && data.getStatus().equals(DataStatus.REMOVED)) {
-        return;
-      }
-      //TODO handle better concurrency updating
-      ActivityData updated = new ActivityData(target, data.getStatus());
-      activityCache.put(data.getId(), updated);
-      
-      context.update(data.buildModel());
-    }
-  }
-  
-  static class GraphListener<M extends ExoSocialActivity> implements DataChangeListener<M>, StreamFixedSizeListener  {
-
-    /** */
-    final Operator<SimpleUndirectGraph, M> remover;
-
-    /** */
-    final Operator<SimpleUndirectGraph, M> updater;
-
-    /** */
-    final SimpleUndirectGraph graph;
-
-    public GraphListener(SOCContext socContext) {
-      remover = new Remover<M, SimpleUndirectGraph>(socContext);
-      updater = new Updater<M, SimpleUndirectGraph>(socContext);
-      this.graph = socContext.getActivityCacheGraph();
-    }
-
-    @Override
-    public void onAdd(M target) {
-      updater.execute(this.graph, target);
-      //TODO
-      //AStream.UPDATER.in(graph).input(target)
-      //             .feed(builder.key(StreamType.FEED))
-      //             .connection(builder.key(StreamType.CONNECTION))
-      //             .owner(builder.key(StreamType.OWNER)
-      //            .spaces(builder.key(StreamType.MY_SPACES));
-    }
-
-    @Override
-    public void onRemove(M target) {
-      remover.execute(graph, target);
-    }
-
-    @Override
-    public void onUpdate(M target) {
-
-    }
-    
-    @Override
-    public void update(String inVertexId, String outVertexId) {
-      Vertex<Object> inVertex = this.graph.getVertex(inVertexId);
-      Vertex<Object> outVertex = this.graph.getVertex(outVertexId);
-      
-      if (inVertex != null && outVertex != null) {
-        this.graph.removeEdge(inVertex, outVertex);
-      }
-    }
-
   }
 }

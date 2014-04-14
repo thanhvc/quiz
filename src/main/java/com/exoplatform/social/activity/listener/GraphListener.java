@@ -19,10 +19,11 @@ package com.exoplatform.social.activity.listener;
 import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
-import com.exoplatform.social.activity.operator.Remover;
-import com.exoplatform.social.activity.operator.Updater;
+import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.StreamFixedSizeListener;
-import com.exoplatform.social.graph.Operator;
+import com.exoplatform.social.activity.storage.stream.AStream;
+import com.exoplatform.social.activity.storage.stream.AStream.UPDATER;
+import com.exoplatform.social.activity.storage.stream.AStream.REMOVER;
 import com.exoplatform.social.graph.Vertex;
 import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
@@ -33,30 +34,50 @@ import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
  * Apr 11, 2014  
  */
 public class GraphListener<M extends ExoSocialActivity> implements DataChangeListener<M>, StreamFixedSizeListener  {
-
-  /** */
-  final Operator<SimpleUndirectGraph, M> remover;
-
-  /** */
-  final Operator<SimpleUndirectGraph, M> updater;
-
   /** */
   final SimpleUndirectGraph graph;
+  /** */
+  final SOCContext socContext;
 
   public GraphListener(SOCContext socContext) {
-    remover = new Remover<M, SimpleUndirectGraph>(socContext);
-    updater = new Updater<M, SimpleUndirectGraph>(socContext);
+    this.socContext = socContext;
     this.graph = socContext.getActivityCacheGraph();
   }
 
   @Override
   public void onAdd(M target) {
-    updater.execute(this.graph, target);
+    
+    ExoSocialActivity a = target;
+    if (target.isComment()) {
+      ActivityData parentData = this.socContext.getActivityCache().get(target.getParentId());
+      if (parentData != null) {
+        a = parentData.build();
+      } else {
+        return;
+      }
+    }
+    
+    //
+    AStream.Builder builder = AStream.initActivity(a);
+    UPDATER.init().context(socContext)
+                   .feed(builder)
+                   .connection(builder)
+                   .owner(builder)
+                   .myspaces(builder)
+                   .space(builder).doExecute();
   }
 
   @Override
   public void onRemove(M target) {
-    remover.execute(graph, target);
+    if (target.isComment()) return;
+    //
+    AStream.Builder builder = AStream.initActivity(target);
+    REMOVER.init().context(socContext)
+                   .feed(builder)
+                   .connection(builder)
+                   .owner(builder)
+                   .myspaces(builder)
+                   .space(builder).doExecute();
   }
 
   @Override

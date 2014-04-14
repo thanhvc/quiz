@@ -51,8 +51,8 @@ public class VersionChangeContextTest extends AbstractActivityTest {
 
     for(ExoSocialActivity a : made) {
       Builder builder = AStream.initActivity(a);
-      versionContext.add(builder.feedKey());
-      versionContext.add(builder.ownerKey());
+      versionContext.add(builder.feedRefKey());
+      versionContext.add(builder.ownerRefKey());
     }
     
     assertEquals(10, this.versionContext.getChangesSize());
@@ -63,8 +63,8 @@ public class VersionChangeContextTest extends AbstractActivityTest {
 
     for(ExoSocialActivity a : made) {
       Builder builder = AStream.initActivity(a);
-      versionContext.add(builder.feedKey());
-      versionContext.add(builder.ownerKey());
+      versionContext.add(builder.feedRefKey());
+      versionContext.add(builder.ownerRefKey());
     }
     
     ExoSocialActivity a3 = made.get(3);
@@ -73,13 +73,13 @@ public class VersionChangeContextTest extends AbstractActivityTest {
     a3.setLastUpdated(increaseLastUpdated);
     
     Builder builder = AStream.initActivity(a3);
-    versionContext.add(builder.feedKey());
-    versionContext.add(builder.ownerKey());
+    versionContext.add(builder.feedRefKey());
+    versionContext.add(builder.ownerRefKey());
     
     assertEquals(10, this.versionContext.getChangesSize());
-    Long revision = this.versionContext.getRevision(builder.feedKey());
+    Long revision = this.versionContext.getRevision(builder.feedRefKey());
     assertEquals(increaseLastUpdated, revision);
-    revision = this.versionContext.getRevision(builder.ownerKey());
+    revision = this.versionContext.getRevision(builder.ownerRefKey());
     assertEquals(increaseLastUpdated, revision);
     
   }
@@ -89,8 +89,8 @@ public class VersionChangeContextTest extends AbstractActivityTest {
 
     for(ExoSocialActivity a : made) {
       Builder builder = AStream.initActivity(a);
-      versionContext.add(builder.feedKey());
-      versionContext.add(builder.ownerKey());
+      versionContext.add(builder.feedRefKey());
+      versionContext.add(builder.ownerRefKey());
     }
     
     ExoSocialActivity a1 = made.get(1);
@@ -99,13 +99,13 @@ public class VersionChangeContextTest extends AbstractActivityTest {
     a1.setLastUpdated(decreaseLastUpdated);
     
     Builder builder = AStream.initActivity(a1);
-    versionContext.add(builder.feedKey());
-    versionContext.add(builder.ownerKey());
+    versionContext.add(builder.feedRefKey());
+    versionContext.add(builder.ownerRefKey());
     
     assertEquals(10, this.versionContext.getChangesSize());
-    Long revision = this.versionContext.getRevision(builder.feedKey());
+    Long revision = this.versionContext.getRevision(builder.feedRefKey());
     assertTrue(decreaseLastUpdated < revision);
-    revision = this.versionContext.getRevision(builder.ownerKey());
+    revision = this.versionContext.getRevision(builder.ownerRefKey());
     assertTrue(decreaseLastUpdated < revision);
     
   }

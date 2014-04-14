@@ -46,23 +46,23 @@ public class AStreamVersion {
   
   public void owner(Builder builder) {
     if (builder.isUserOwner) {
-      versionContext.add(builder.feedKey(), builder.ownerKey());
+      versionContext.add(builder.feedRefKey(), builder.ownerRefKey());
     } else {
-      versionContext.add(builder.feedKey(), builder.mySpacesKey());
+      versionContext.add(builder.feedRefKey(), builder.mySpacesRefKey());
     }
   }
   
   public void connecter(Builder builder) {
     if (builder.isUserOwner) {
-      versionContext.add(builder.feedKey(), builder.connectionsKey());
+      versionContext.add(builder.feedRefKey(), builder.connectionsRefKey());
     }
   }
   
   public void remove(Builder builder) {
     if (builder.isUserOwner) {
-      versionContext.remove(builder.feedKey(), builder.ownerKey(), builder.connectionsKey());
+      versionContext.remove(builder.feedRefKey(), builder.ownerRefKey(), builder.connectionsRefKey());
     } else {
-      versionContext.remove(builder.feedKey(), builder.mySpacesKey());
+      versionContext.remove(builder.feedRefKey(), builder.mySpacesRefKey());
     }
   }
   

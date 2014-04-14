@@ -76,7 +76,7 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefKey> keys = new ArrayList<ActivityRefKey>(made.size());
     
     for(ExoSocialActivity a : made) {
-      keys.add(AStream.initActivity(a).feedKey());
+      keys.add(AStream.initActivity(a).feedRefKey());
     }
     
     for(ActivityRefKey key : keys) {
@@ -91,7 +91,7 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefKey> keys = new ArrayList<ActivityRefKey>(made.size());
     
     for(ExoSocialActivity a : made) {
-      keys.add(AStream.initActivity(a).connectionsKey());
+      keys.add(AStream.initActivity(a).connectionsRefKey());
     }
     
     for(ActivityRefKey key : keys) {
@@ -106,13 +106,11 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefKey> keys = new ArrayList<ActivityRefKey>(made.size());
     
     for(ExoSocialActivity a : made) {
-      keys.add(AStream.initActivity(a).mySpacesKey());
+      keys.add(AStream.initActivity(a).mySpacesRefKey());
     }
     
     for(ActivityRefKey key : keys) {
-      assertEquals(StreamType.MY_SPACES, key.type);
-      assertNotNull(key.activityId);
-      assertNotNull(key.identityId);
+      assertNull(key);
     }
   }
   
@@ -121,7 +119,7 @@ public class ActivityRefContextTest extends AbstractActivityTest {
     List<ActivityRefKey> keys = new ArrayList<ActivityRefKey>(made.size());
     
     for(ExoSocialActivity a : made) {
-      keys.add(AStream.initActivity(a).ownerKey());
+      keys.add(AStream.initActivity(a).ownerRefKey());
     }
     
     for(ActivityRefKey key : keys) {

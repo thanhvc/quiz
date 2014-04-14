@@ -18,13 +18,18 @@ package com.exoplatform.social.activity.storage.stream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
+import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.IdentityProvider;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
+import com.exoplatform.social.activity.storage.cache.data.StreamFixedSizeListener;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
 import com.exoplatform.social.activity.storage.stream.ActivityRefContext.PostType;
+import com.exoplatform.social.graph.GraphContext.Scope;
+import com.exoplatform.social.graph.Vertex;
 import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
 /**
@@ -33,66 +38,135 @@ import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
  *          exo@exoplatform.com
  * Apr 12, 2014  
  */
-public abstract class AStream {
+public abstract class AStream implements StreamFixedSizeListener {
   
-  private SimpleUndirectGraph graph; 
+  protected SOCContext socContext; 
   
   final List<ActivityRefKey> keys;
-  final SOCContext socContext;
-//TODO
-  //AStream.UPDATER.graph(graph).input(target)
+  //TODO
+  //AStream.UPDATER.context(SOCContext).input(target)
   //             .feed(builder.key(StreamType.FEED))
   //             .connection(builder.key(StreamType.CONNECTION))
   //             .owner(builder.key(StreamType.OWNER)
   //            .spaces(builder.key(StreamType.MY_SPACES));
   
-  public AStream(SOCContext socContext) {
-    keys = new ArrayList<ActivityRefKey>(4);
+  public AStream() {
+    keys = new ArrayList<ActivityRefKey>(5);
+  }
+  
+  public AStream context(SOCContext socContext) {
     this.socContext = socContext;
-  }
-  public AStream graph(SimpleUndirectGraph graph) {
-    this.graph = graph;
     return this;
   }
   
-  public AStream feed(Builder builder, ActivityRefKey feedKey) {
-    this.keys.add(feedKey);
+  public AStream feed(Builder builder) {
+    this.keys.add(builder.feedRefKey());
     return this;
   }
   
-  public AStream owner(Builder builder, ActivityRefKey ownerKey) {
+  public AStream owner(Builder builder) {
     if (builder.isUserOwner) {
-      this.keys.add(ownerKey);
+      this.keys.add(builder.ownerRefKey());
     }
     
     return this;
   }
   
-  public AStream connection(Builder builder, ActivityRefKey connectionKey) {
+  public AStream connection(Builder builder) {
     if (builder.isUserConnection) {
-      this.keys.add(connectionKey);
+      this.keys.add(builder.connectionsRefKey());
     }
     
     return this;
   }
   
-  public AStream myspaces(Builder builder, ActivityRefKey myspacesKey) {
-    if (!builder.isUserConnection) {
-      this.keys.add(myspacesKey);
+  public AStream myspaces(Builder builder) {
+    if (!builder.isUserOwner) {
+      this.keys.add(builder.mySpacesRefKey());
     }
     
     return this;
   }
   
-  protected abstract void doExecute();
+  public AStream space(Builder builder) {
+    if (!builder.isUserOwner) {
+      this.keys.add(builder.spaceRefKey());
+    }
+    
+    return this;
+  }
   
+  @Override
+  public void update(String inVertexId, String outVertexId) {
+    SimpleUndirectGraph graph = this.socContext.getActivityCacheGraph();
+    Vertex<Object> inVertex = graph.getVertex(inVertexId);
+    Vertex<Object> outVertex = graph.getVertex(outVertexId);
+    
+    if (inVertex != null && outVertex != null) {
+      graph.removeEdge(inVertex, outVertex);
+    }
+  }
   
+  public abstract void doExecute();
   
-  public static AStream UPDATER = new AStream() {
-
+  public static class UPDATER extends AStream {
+    
+    public static AStream init() {
+      return new UPDATER();
+    }
     @Override
-    protected void doExecute() {
+    public void doExecute() {
+      Map<ListActivitiesKey, ActivitiesListData> activitiesCache = this.socContext.getActivitiesCache();
+      SimpleUndirectGraph graph = this.socContext.getActivityCacheGraph();
       
+      //
+      for(ActivityRefKey refKey : keys) {
+        ListActivitiesKey cacheKey = refKey.listActivitiesKey();
+        ActivitiesListData data = activitiesCache.get(cacheKey);
+        
+        if (data == null) {
+          data = new ActivitiesListData(cacheKey.label());
+          activitiesCache.put(cacheKey, data);
+          
+          Vertex<Object> inVertex = graph.addVertex(refKey.activityId);
+          Vertex<Object> outVertex = graph.addVertex(cacheKey);
+          graph.addEdge(cacheKey.label(), inVertex, outVertex);
+        }
+        
+        data.insertFirst(refKey.activityId, this);
+      }
+    }
+    
+  };
+  
+  public static class REMOVER extends AStream {
+    
+    public static AStream init() {
+      return new REMOVER();
+    }
+    
+    
+    @Override
+    public void doExecute() {
+      Map<ListActivitiesKey, ActivitiesListData> activitiesCache = this.socContext.getActivitiesCache();
+      SimpleUndirectGraph graph = this.socContext.getActivityCacheGraph();
+      
+      //
+      for(ActivityRefKey refKey : keys) {
+        ListActivitiesKey cacheKey = refKey.listActivitiesKey();
+        ActivitiesListData data = activitiesCache.get(cacheKey);
+        
+          if (data != null) {
+            //this.activityGraph.removeEdge(key.label())
+            //.removeVertex(String.class, target.getId())
+            //.removeVertex(ListActivitiesKey.class, key)
+            graph.removeEdge(cacheKey.label());
+            graph.removeVertex(String.class, refKey.activityId, Scope.ALL);
+            graph.removeVertex(ListActivitiesKey.class, cacheKey.label(), Scope.SINGLE);
+            data.remove(refKey.activityId);
+        }
+        
+      }
     }
     
   };
@@ -112,7 +186,6 @@ public abstract class AStream {
   public static Builder initComment(String identityId, ExoSocialActivity activity, ExoSocialActivity comment) {
     return new Builder(identityId, activity, comment);
   }
-  
 
   public static class Builder {
     public boolean isUserOwner;
@@ -121,6 +194,7 @@ public abstract class AStream {
     public ExoSocialActivity activity;
     public ExoSocialActivity comment;
     public PostType type;
+    public SOCContext socContext;
     
     public Builder(ExoSocialActivity activity, ExoSocialActivity comment) {
      this(activity.getPosterId(), activity, comment);
@@ -152,7 +226,7 @@ public abstract class AStream {
      * Build the feed stream key and context
      * @return
      */
-    public ActivityRefKey feedKey() {
+    public ActivityRefKey feedRefKey() {
       return new ActivityRefKey(this, StreamType.FEED);
     }
     
@@ -160,7 +234,7 @@ public abstract class AStream {
      * Build the connection stream key and context
      * @return
      */
-    public ActivityRefKey connectionsKey() {
+    public ActivityRefKey connectionsRefKey() {
       return this.isUserOwner ? new ActivityRefKey(this, StreamType.CONNECTION) : null;
     }
     
@@ -168,7 +242,7 @@ public abstract class AStream {
      * Build the owner stream key and context
      * @return
      */
-    public ActivityRefKey ownerKey() {
+    public ActivityRefKey ownerRefKey() {
       return this.isUserOwner ? new ActivityRefKey(this, StreamType.OWNER) : null;
     }
     /**
@@ -176,9 +250,14 @@ public abstract class AStream {
      *
      * @return
      */
-    public ActivityRefKey mySpacesKey() {
+    public ActivityRefKey mySpacesRefKey() {
       //TODO return NULL Option
-      return this.isUserOwner ? new ActivityRefKey(this, StreamType.MY_SPACES) : null;
+      return !this.isUserOwner ? new ActivityRefKey(this, StreamType.MY_SPACES) : null;
+    }
+    
+    public ActivityRefKey spaceRefKey() {
+      //TODO return NULL Option
+      return !this.isUserOwner ? new ActivityRefKey(this, StreamType.SPACE_STREAM) : null;
     }
     
     public ListActivitiesKey feedCacheKey() {

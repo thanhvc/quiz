@@ -44,11 +44,11 @@ public class CachedListener<M extends ExoSocialActivity> implements DataChangeLi
   /** */
   final SOCContext socContext;
   
-  public CachedListener(SOCContext socContext) {
-    this.socContext = socContext;
-    this.context = socContext.getDataContext();
+  public CachedListener(DataContext<DataModel> context, SOCContext socContext) {
+    this.context = context;
     this.activityCache = socContext.getActivityCache();
     this.activitiesCache = socContext.getActivitiesCache();
+    this.socContext = socContext;
   }
 
   @Override
@@ -85,5 +85,4 @@ public class CachedListener<M extends ExoSocialActivity> implements DataChangeLi
     
     context.update(data.buildModel());
   }
- 
 }
