@@ -122,7 +122,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     //
     cachedListener.onUpdate(activity);
     cachedListener.onAdd(comment);
-    graphListener.onAdd(comment);
+    graphListener.onUpdate(activity);
     commit(false);
   }
 

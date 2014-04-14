@@ -46,7 +46,6 @@ public class GraphListener<M extends ExoSocialActivity> implements DataChangeLis
 
   @Override
   public void onAdd(M target) {
-    
     ExoSocialActivity a = target;
     if (target.isComment()) {
       ActivityData parentData = this.socContext.getActivityCache().get(target.getParentId());
@@ -82,7 +81,13 @@ public class GraphListener<M extends ExoSocialActivity> implements DataChangeLis
 
   @Override
   public void onUpdate(M target) {
-
+    AStream.Builder builder = AStream.initActivity(target);
+    UPDATER.init().context(socContext)
+                   .feed(builder)
+                   .connection(builder)
+                   .owner(builder)
+                   .myspaces(builder)
+                   .space(builder).doExecute();
   }
 
   @Override
