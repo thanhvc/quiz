@@ -88,7 +88,7 @@ public final class DataContext<M> {
       return Collections.emptyList();
     }
   }
-
+  
   public DataChangeQueue<M> popChanges() {
     if (hasChanges()) {
       DataChangeQueue<M> tmp = changes;
@@ -98,4 +98,12 @@ public final class DataContext<M> {
       return null;
     }
   }
+  
+  public void clearAll() {
+    if (changes != null) {
+      this.changes.clear();
+    }
+    
+  }
+
 }

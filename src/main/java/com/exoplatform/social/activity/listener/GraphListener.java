@@ -19,12 +19,9 @@ package com.exoplatform.social.activity.listener;
 import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
-import com.exoplatform.social.activity.storage.cache.data.ActivityData;
-import com.exoplatform.social.activity.storage.cache.data.StreamFixedSizeListener;
 import com.exoplatform.social.activity.storage.stream.AStream;
-import com.exoplatform.social.activity.storage.stream.AStream.UPDATER;
 import com.exoplatform.social.activity.storage.stream.AStream.REMOVER;
-import com.exoplatform.social.graph.Vertex;
+import com.exoplatform.social.activity.storage.stream.AStream.UPDATER;
 import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
 
 /**
@@ -33,7 +30,7 @@ import com.exoplatform.social.graph.simple.SimpleUndirectGraph;
  *          exo@exoplatform.com
  * Apr 11, 2014  
  */
-public class GraphListener<M extends ExoSocialActivity> implements DataChangeListener<M>, StreamFixedSizeListener  {
+public class GraphListener<M extends ExoSocialActivity> implements DataChangeListener<M> {
   /** */
   final SimpleUndirectGraph graph;
   /** */
@@ -46,18 +43,7 @@ public class GraphListener<M extends ExoSocialActivity> implements DataChangeLis
 
   @Override
   public void onAdd(M target) {
-    ExoSocialActivity a = target;
-    if (target.isComment()) {
-      ActivityData parentData = this.socContext.getActivityCache().get(target.getParentId());
-      if (parentData != null) {
-        a = parentData.build();
-      } else {
-        return;
-      }
-    }
-    
-    //
-    AStream.Builder builder = AStream.initActivity(a);
+    AStream.Builder builder = AStream.initActivity(target);
     UPDATER.init().context(socContext)
                    .feed(builder)
                    .connection(builder)
@@ -90,14 +76,6 @@ public class GraphListener<M extends ExoSocialActivity> implements DataChangeLis
                    .space(builder).doExecute();
   }
 
-  @Override
-  public void update(String inVertexId, String outVertexId) {
-    Vertex<Object> inVertex = this.graph.getVertex(inVertexId);
-    Vertex<Object> outVertex = this.graph.getVertex(outVertexId);
-    
-    if (inVertex != null && outVertex != null) {
-      this.graph.removeEdge(inVertex, outVertex);
-    }
-  }
+  
 
 }

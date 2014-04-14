@@ -55,6 +55,28 @@
           <argLine>-Xmx4096m -XX:MaxPermSize=1024m</argLine>
         </configuration>
         </plugin>
+        <plugin>
+          <!-- Usage: mvn compile org.pitest:pitest-maven:mutationCoverage -->
+          <groupId>org.pitest</groupId>
+          <artifactId>pitest-maven</artifactId>
+          <version>0.32</version>
+          <configuration>
+            <jvmArgs>
+              <value>-XX:-UseSplitVerifier -Xmx4096m -XX:MaxPermSize=1024m</value>
+            </jvmArgs>
+            <targetClasses>
+              <param>com.exoplatform.social.*</param>
+            </targetClasses>
+            <targetTests>
+              <param>com.exoplatform.social.*</param>
+            </targetTests>
+            <excludedClasses>
+              <param>com.exoplatform.social.activity.GraphPerfActivityStorageTest</param>
+              <param>com.exoplatform.social.graph.GraphPerfTest</param>
+            </excludedClasses>
+          </configuration>
+      </plugin>
     </plugins>
+    
   </build>
 </project>

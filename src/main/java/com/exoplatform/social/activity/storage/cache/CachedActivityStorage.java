@@ -27,8 +27,10 @@ import com.exoplatform.social.SOCContext;
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.DataChangeQueue;
 import com.exoplatform.social.activity.DataContext;
+import com.exoplatform.social.activity.listener.AbstractActivityListener;
 import com.exoplatform.social.activity.listener.CachedListener;
 import com.exoplatform.social.activity.listener.GraphListener;
+import com.exoplatform.social.activity.listener.SimpleActivityListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.persister.Persister;
 import com.exoplatform.social.activity.persister.PersisterTask;
@@ -55,11 +57,9 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   /** */
   final DataContext<DataModel> context;
   /** */
-  final DataChangeListener<ExoSocialActivity> cachedListener;
-  /** */
   final DataChangeListener<DataModel> jcrPersisterListener;
   /** */
-  final GraphListener<ExoSocialActivity> graphListener;
+  final AbstractActivityListener<ExoSocialActivity> activityListener;
   /** */
   final PersisterTask timerTask;
   /** */
@@ -74,10 +74,9 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
   public CachedActivityStorage(int persisterThreshold, SOCContext socContext, ActivityStorage storage) {
     this.storage = storage;
     this.socContext = socContext;
-    this.context = new  DataContext<DataModel>();
-    this.cachedListener = new CachedListener<ExoSocialActivity>(context, socContext);
+    this.context = socContext.getDataContext();
+    this.activityListener = new SimpleActivityListener<ExoSocialActivity>(socContext);
     this.jcrPersisterListener = new PersisterListener(this.storage, socContext);
-    this.graphListener = new GraphListener<ExoSocialActivity>(socContext);
     this.activityCache = socContext.getActivityCache();
     this.activitiesCache = socContext.getActivitiesCache();
     timerTask = PersisterTask.init()
@@ -108,8 +107,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
 
   @Override
   public void saveActivity(ExoSocialActivity activity) {
-    cachedListener.onAdd(activity);
-    graphListener.onAdd(activity);
+    this.activityListener.onAddActivity(activity);
     commit(false);
   }
 
@@ -120,22 +118,19 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     activity.setLastUpdated(System.currentTimeMillis());
     comment.setParentId(activity.getId());
     //
-    cachedListener.onUpdate(activity);
-    cachedListener.onAdd(comment);
-    graphListener.onUpdate(activity);
+    this.activityListener.onAddComment(activity, comment);
     commit(false);
   }
 
   @Override
   public void update(ExoSocialActivity activity) {
-    cachedListener.onUpdate(activity);
+    this.activityListener.onUpdateActivity(activity);
     commit(false);
   }
   
   @Override
   public void deleteActivity(ExoSocialActivity activity) {
-    cachedListener.onRemove(activity);
-    graphListener.onRemove(activity);
+    this.activityListener.onRemoveActivity(activity);
     commit(false);
   }
 
@@ -149,9 +144,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     
     
     activityCache.put(data.getId(), data);
-    cachedListener.onUpdate(activityCache.get(activityId).build());
-    cachedListener.onRemove(activityCache.get(commentId).build());
-    
+    this.activityListener.onRemoveComment(activityCache.get(activityId).build(), activityCache.get(commentId).build());
     commit(false);
   }
   
@@ -274,7 +267,7 @@ public class CachedActivityStorage implements ActivityStorage, Persister {
     for(int i = activities.size()-1; i >= 0; i--) {
       ExoSocialActivity a = activities.get(i);
       if (!data.contains(a.getId())) {
-        data.insertFirst(a.getId(), this.graphListener);
+        data.insertFirst(a.getId(), this.activityListener);
       }
       //
       if (!this.activityCache.containsKey(a.getId())) {

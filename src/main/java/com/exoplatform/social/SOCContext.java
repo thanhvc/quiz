@@ -49,7 +49,6 @@ public class SOCContext {
   /** */
   final DataContext<DataModel> context;
   
-  
   /** */
   final SimpleUndirectGraph activityCacheGraph;
   
@@ -107,6 +106,7 @@ public class SOCContext {
     this.activityCacheGraph.clear();
     this.relationshipCacheGraph.clear();
     streamUpdater.clearAll();
+    this.context.clearAll();
   }
   
   public class ActivityTask implements Runnable {
