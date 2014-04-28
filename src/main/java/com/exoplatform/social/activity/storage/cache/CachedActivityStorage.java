@@ -28,8 +28,7 @@ import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.DataChangeQueue;
 import com.exoplatform.social.activity.DataContext;
 import com.exoplatform.social.activity.listener.AbstractActivityListener;
-import com.exoplatform.social.activity.listener.CachedListener;
-import com.exoplatform.social.activity.listener.GraphListener;
+import com.exoplatform.social.activity.listener.PersisterListener;
 import com.exoplatform.social.activity.listener.SimpleActivityListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.persister.Persister;
@@ -41,7 +40,6 @@ import com.exoplatform.social.activity.storage.cache.data.DataModel;
 import com.exoplatform.social.activity.storage.cache.data.DataStatus;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
-import com.exoplatform.social.activity.storage.impl.ActivityStorageImpl.PersisterListener;
 
 /**
  * Created by The eXo Platform SAS

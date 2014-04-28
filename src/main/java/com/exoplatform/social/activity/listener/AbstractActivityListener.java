@@ -16,7 +16,6 @@
  */
 package com.exoplatform.social.activity.listener;
 
-import com.exoplatform.social.activity.storage.cache.data.StreamFixedSizeListener;
 
 
 /**

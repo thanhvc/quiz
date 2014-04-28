@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.exoplatform.social.SOCContext;
+import com.exoplatform.social.activity.listener.StreamFixedSizeListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
 import com.exoplatform.social.activity.storage.cache.data.IdentityProvider;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;
-import com.exoplatform.social.activity.storage.cache.data.StreamFixedSizeListener;
 import com.exoplatform.social.activity.storage.cache.data.StreamType;
 import com.exoplatform.social.activity.storage.stream.ActivityRefContext.PostType;
 import com.exoplatform.social.graph.GraphContext.Scope;

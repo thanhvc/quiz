@@ -83,6 +83,32 @@ public class GraphCachedActivityStorageTest extends AbstractActivityTest {
     assertEquals(15, activityIds.size());
     printOut(activityIds);
   }
+  
+  public void testAddTwoIdentties() throws Exception {
+    List<ExoSocialActivity> maryList = listOf(1, "mary", false, true);
+    
+    ExoSocialActivity activityMary0 = maryList.get(0);
+    
+    List<ExoSocialActivity> rootList = listOf(1, "root", false, true);
+    ExoSocialActivity activityRoot0 = maryList.get(0);
+    
+    Vertex<Object> v = socContext.getActivityCacheGraph().getVertex(activityMary0.getId());
+    assertNotNull(v);
+    List<Vertex<Object>> adjacents = socContext.getActivityCacheGraph().getAdjacents(activityMary0.getId());
+    assertNotNull(adjacents);
+    assertEquals(2, adjacents.size());
+    
+    ListActivitiesKey key = adjacents.get(0).unwrap(ListActivitiesKey.class);
+    ActivitiesListData listData = socContext.getActivitiesCache().get(key);
+    
+    assertNotNull(listData);
+    
+    List<String> activityIds = listData.subList(0, 20);
+    
+    assertNotNull(activityIds);
+    assertEquals(15, activityIds.size());
+    printOut(activityIds);
+  }
 
   
   public void testGetFeed() throws Exception {

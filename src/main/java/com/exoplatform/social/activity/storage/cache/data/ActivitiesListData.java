@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.exoplatform.social.activity.listener.StreamFixedSizeListener;
+
 
 /**
  * Created by The eXo Platform SAS

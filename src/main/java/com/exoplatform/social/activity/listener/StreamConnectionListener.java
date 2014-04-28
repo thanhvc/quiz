@@ -18,7 +18,6 @@ package com.exoplatform.social.activity.listener;
 
 import com.exoplatform.social.activity.DataChangeListener;
 import com.exoplatform.social.activity.model.ExoSocialActivity;
-import com.exoplatform.social.activity.storage.cache.data.StreamFixedSizeListener;
 
 /**
  * Created by The eXo Platform SAS
