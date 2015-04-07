@@ -14,25 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.proxy;
+package com.exoplatform.quiz.queue;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Apr 6, 2014  
+ * Jun 5, 2014  
  */
-public interface Person extends BaseEntity<Person>{
+public class SuffixPattern {
 
-  String getName();
-  
-  Person setName(String name);
-  
-  int getAge();
-  
-  Person setAge(int age);
-  
-  Person setIdentity(IdentityEntity identity);
-  
-  IdentityEntity getIdentity();
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    int number = 0;
+    String formatted = String.format("%s%04d", "abcuser", number);
+    System.out.println(formatted);
+  }
+
 }

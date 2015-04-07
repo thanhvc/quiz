@@ -14,25 +14,39 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.proxy;
+package com.exoplatform.quiz.queue;
+
+import java.io.StringWriter;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Apr 6, 2014  
+ * May 7, 2014  
  */
-public interface Person extends BaseEntity<Person>{
+public class SpacePrettyNameTest {
+  
+  public static void main(String[] args) throws Exception {
+    String test = convertSpecialCharacters("õspace1");
+    System.out.println(test);
+  }
+  
+  public static String convertSpecialCharacters(String text) {
+    if (text == null) return null;
+    final char SPECIAL_CHARACTERS = 'õ';
+    final char LATIN_CHARACTERS = 'i';
+    
+    StringWriter writer = new StringWriter(text.length());
+    for (int i = 0; i < text.length(); i++) {
+      char currentCharacter = text.charAt(i);
+      if (currentCharacter == SPECIAL_CHARACTERS) {
+        writer.write(LATIN_CHARACTERS);
+      } else {
+        writer.write(currentCharacter);
+      }
+    }
+    
+    return writer.toString();
+  }
 
-  String getName();
-  
-  Person setName(String name);
-  
-  int getAge();
-  
-  Person setAge(int age);
-  
-  Person setIdentity(IdentityEntity identity);
-  
-  IdentityEntity getIdentity();
 }

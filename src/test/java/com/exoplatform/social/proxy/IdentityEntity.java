@@ -22,17 +22,13 @@ package com.exoplatform.social.proxy;
  *          exo@exoplatform.com
  * Apr 6, 2014  
  */
-public interface Person extends BaseEntity<Person>{
+public interface IdentityEntity extends BaseEntity<IdentityEntity> {
 
-  String getName();
+   String getFirstName();
   
-  Person setName(String name);
-  
-  int getAge();
-  
-  Person setAge(int age);
-  
-  Person setIdentity(IdentityEntity identity);
-  
-  IdentityEntity getIdentity();
+   IdentityEntity setFirstName(String firstName);
+   
+   String getLastName();
+   
+   IdentityEntity setLastName(String lastName);
 }

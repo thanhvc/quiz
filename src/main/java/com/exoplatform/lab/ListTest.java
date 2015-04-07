@@ -14,25 +14,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.proxy;
+package com.exoplatform.lab;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Apr 6, 2014  
+ * Sep 3, 2014  
  */
-public interface Person extends BaseEntity<Person>{
+public class ListTest {
 
-  String getName();
-  
-  Person setName(String name);
-  
-  int getAge();
-  
-  Person setAge(int age);
-  
-  Person setIdentity(IdentityEntity identity);
-  
-  IdentityEntity getIdentity();
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    // TODO Auto-generated method stub
+    List<String> list1 = new ArrayList<String>();
+    list1.add("1");
+    list1.add("2");
+    list1.add("3");
+    List<String> list2 = new ArrayList<String>();
+
+    list2.add("3");
+    list2.add("4");
+    list2.add("5");
+    //keep the same
+    //list1.retainAll(list2);
+    list1.addAll(list2);
+    
+    Collection<String> union = new TreeSet<String>(list1);
+    union.addAll(list2);
+    
+    System.out.println("List1 lenght = " + list1.size());
+    System.out.println("union lenght = " + union.size());
+  }
+
 }

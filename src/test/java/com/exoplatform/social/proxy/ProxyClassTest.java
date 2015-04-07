@@ -16,27 +16,42 @@
  */
 package com.exoplatform.social.proxy;
 
+import junit.framework.TestCase;
+
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
  * Apr 6, 2014  
  */
-public class ProxyClassTest {
+public class ProxyClassTest extends TestCase {
 
   /**
    * @param args
    */
-  public static void main(String[] args) {
-    Person mark = ImmutableBuilder.of(Person.class).name("mark").age(31);
-    //Person john = ImmutableBuilder.of(Person.class).name("john").age(24);
-    Person john = mark.name("john").age(24);
+  public void test() throws Exception {
+   IdentityEntity identity = ImmutableBuilder.of(IdentityEntity.class)
+                                              .setId("identityId1")
+                                              .setFirstName("mary")
+                                              .setLastName("kelly");
     
-    Person mary = john.name("mary");
+    Person mark = ImmutableBuilder.of(Person.class)
+                                  .setId("id1")
+                                  .setName("mark")
+                                  .setIdentity(identity);
+    /** if the data is existing in Map, create new instance of John*/
+    Person john = mark.setName("john").setAge(24);
+    /** if the data is existing in Map, create new instance of mary*/
+    Person mary = john.setName("mary");
     
-    System.out.println(mark);
-    System.out.println(john);
-    System.out.println(mary);
+    assertEquals("mark", mark.getName());
+    assertEquals("id1", mark.getId());
+    assertEquals("john", john.getName());
+    assertEquals("mary", mary.getName());
+    
+    //JsonGeneratorImpl jsonGenerator = new JsonGeneratorImpl();
+    //JsonValue jsonValue = jsonGenerator.createJsonObjectFromMap(mark.values());
+    //System.out.println(jsonValue.toString());
 
   }
 

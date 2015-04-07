@@ -35,7 +35,6 @@ import com.exoplatform.social.activity.persister.Persister;
 import com.exoplatform.social.activity.persister.PersisterTask;
 import com.exoplatform.social.activity.storage.ActivityStorage;
 import com.exoplatform.social.activity.storage.cache.data.ActivitiesListData;
-import com.exoplatform.social.activity.storage.cache.data.ActivityData;
 import com.exoplatform.social.activity.storage.cache.data.DataModel;
 import com.exoplatform.social.activity.storage.cache.data.DataStatus;
 import com.exoplatform.social.activity.storage.cache.data.ListActivitiesKey;

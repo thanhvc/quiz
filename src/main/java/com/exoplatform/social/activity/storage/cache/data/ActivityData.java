@@ -109,6 +109,10 @@ public class ActivityData {
   public void setId(String id) {
     this.id = id;
   }
+  
+  public String getParentId() {
+    return parentId;
+  }
 
   public String getTitleId() {
     return titleId;

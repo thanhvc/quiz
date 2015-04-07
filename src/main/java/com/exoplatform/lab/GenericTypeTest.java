@@ -35,6 +35,9 @@ public class GenericTypeTest {
 
     //
     f.setFavorite(new TypeReference<String>() {}, "Hello");
+    
+    //
+    f.setFavorite(new TypeReference<Object>() {}, "Hello");
 
     //
     List<String> newList = f.getFavorite(new TypeReference<ArrayList<String>>() {});
@@ -49,6 +52,9 @@ public class GenericTypeTest {
     f.setFavorite(new TypeReference<String[]>() {}, arrays);
     String[] newArrays = f.getFavorite(new TypeReference<String[]>(){});
     System.out.println(Arrays.asList(newArrays));
+    
+    Object value = f.getFavorite(new TypeReference<Object>() {});
+    System.out.println(value);
   }
 
 }

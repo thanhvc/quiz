@@ -14,25 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.proxy;
+package com.exoplatform.lab;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Apr 6, 2014  
+ * Jun 24, 2014  
  */
-public interface Person extends BaseEntity<Person>{
+public class ClassSimpleNameTest1 {
 
-  String getName();
-  
-  Person setName(String name);
-  
-  int getAge();
-  
-  Person setAge(int age);
-  
-  Person setIdentity(IdentityEntity identity);
-  
-  IdentityEntity getIdentity();
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    System.out.println(ClassSimpleNameTest1.class.getSimpleName());
+
+  }
+
 }

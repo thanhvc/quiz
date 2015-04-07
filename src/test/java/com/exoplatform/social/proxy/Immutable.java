@@ -47,21 +47,30 @@ public class Immutable implements InvocationHandler {
       return fields.hashCode();
     }
     
-    String fieldName = method.getName();
+    if (method.getName().equals("values")) {
+      return fields;
+    }
     
-    if (method.getReturnType().equals(targetClass)) {
-      if (!fields.containsKey(fieldName)) {
-        fields.put(fieldName, args[0]);
+    String fieldName = method.getName();
+    String key = fieldName.replace("set", "");
+    key = key.replace("get", "").toLowerCase();
+    
+    if (fieldName.startsWith("set")) {
+      if (!fields.containsKey(key)) {
+        fields.put(key, args[0]);
         return proxy;
       } else {
         Map<String, Object> newFields = new HashMap<String, Object>();
-        newFields.put(fieldName, args[0]);
+        newFields.put(key, args[0]);
         return ImmutableBuilder.of(new Immutable(targetClass, newFields));
       }
+    } else
+      if (fields.containsKey(key)) {
+        return fields.get(key);
+      } else {
+        return null;
+      }
       
-    } else {
-      return fields.get(fieldName);
-    }
   }
   
   public Class<?> getTargetClass() {

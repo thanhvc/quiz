@@ -16,6 +16,7 @@
  */
 package com.exoplatform.social.graph;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -33,6 +34,8 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
   /** the node is wrapped by vertex context*/
   final V vertex;
   
+  final HashSet<H> handles;
+  
   final Class<?> keyType;
   
   /** */
@@ -43,6 +46,7 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
     this.keyType = this.handle.getClass();
     this.graph = graph;
     this.vertex = vertex;
+    this.handles = new HashSet<H>();
   }
   
   public VertexContext(GraphContext<H, V, E> graph, H handle) {
@@ -50,6 +54,7 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
     this.handle = handle;
     this.graph = graph;
     this.vertex = graph.vertexModel.create(this);
+    this.handles = new HashSet<H>();
   }
   
   public H getHandle() {
@@ -76,6 +81,13 @@ public class VertexContext<H, V extends Vertex<H>, E extends Edge<H, V>> extends
     }
     
     return null;
+  }
+  
+  /**
+   * Return TRUE if the Vertex contains the specified element. 
+   */
+  public boolean contains(Object handle) {
+    return this.handles.contains(handle);
   }
   
   public <T> int indexOf(Class<T> type, Object handle) throws NullPointerException {

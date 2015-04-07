@@ -16,23 +16,20 @@
  */
 package com.exoplatform.social.proxy;
 
+import java.util.Map;
+
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
  * Apr 6, 2014  
  */
-public interface Person extends BaseEntity<Person>{
+public interface BaseEntity<E> {
+  
+  String getId();
+  
+  E setId(String id);
+  
+  Map<String, Object> values();
 
-  String getName();
-  
-  Person setName(String name);
-  
-  int getAge();
-  
-  Person setAge(int age);
-  
-  Person setIdentity(IdentityEntity identity);
-  
-  IdentityEntity getIdentity();
 }

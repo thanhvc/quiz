@@ -14,25 +14,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.exoplatform.social.proxy;
+package com.exoplatform.lab;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Apr 6, 2014  
+ * Sep 4, 2014  
  */
-public interface Person extends BaseEntity<Person>{
+public class Class1 {
 
-  String getName();
+  private final List<String> test = new ArrayList<String>();
+
+  public void add(String str) {
+    this.test.add(str);
+  }
   
-  Person setName(String name);
+  public void remove(String str) {
+    this.test.remove(str);
+  }
   
-  int getAge();
-  
-  Person setAge(int age);
-  
-  Person setIdentity(IdentityEntity identity);
-  
-  IdentityEntity getIdentity();
+  public int size() {
+    return this.test.size();
+  }
 }
